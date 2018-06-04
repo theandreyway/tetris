@@ -3,10 +3,12 @@ import logo from './logo.svg';
 import './App.css';
 
 function Board(props) {
-  let rows = []
-  for (let i = 0; i < props.rows; i++) {
-    rows.push(<BoardRow key={i} cols={props.cols}/>);
-  }
+  // Todo: Figure out how to make props.rows be a Number to begin with.
+  const numRows = Number(props.rows)
+  const rows = Array(numRows).fill().map((_, i) => {
+    return <BoardRow key={i} cols={props.cols}/>;
+  })
+
   return (
     <div className="board">
       {rows}
@@ -15,10 +17,10 @@ function Board(props) {
 }
 
 function BoardRow(props) {
-  let cells = []
-  for (let i = 0; i < props.cols; i++) {
-    cells.push(<BoardCell key={i}/>);
-  }
+  const numCells = Number(props.cols)
+  const cells = Array(numCells).fill().map((_, i) => {
+    return <BoardCell key={i}/>;
+  })
 
   return (
     <div className="row">
