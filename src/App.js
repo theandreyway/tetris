@@ -3,10 +3,8 @@ import logo from './logo.svg';
 import './App.css';
 
 function Board(props) {
-  // Todo: Figure out how to make props.rows be a Number to begin with.
-  const numRows = Number(props.rows)
-  const rows = Array(numRows).fill().map((_, i) => {
-    return <BoardRow key={i} cols={props.cols}/>;
+  const rows = props.rows.map((row, i) => {
+    return <BoardRow key={i} cells={row}/>;
   })
 
   return (
@@ -17,9 +15,8 @@ function Board(props) {
 }
 
 function BoardRow(props) {
-  const numCells = Number(props.cols)
-  const cells = Array(numCells).fill().map((_, i) => {
-    return <BoardCell key={i}/>;
+  const cells = props.cells.map((value, i) => {
+    return <BoardCell key={i} value={value}/>;
   })
 
   return (
@@ -30,11 +27,31 @@ function BoardRow(props) {
 }
 
 function BoardCell(props) {
-  return <div className="cell"/>
+  const className = props.value ? "cell on" : "cell";
+  return <div className={className}/>
 }
 
 class App extends Component {
   render() {
+    const numRows = 12;
+    const numCols = 8;
+
+    let rows = Array(numRows)
+    for (let r = 0; r < numRows; r++) {
+      rows[r] = Array(numCols);
+      for (let c = 0; c < numCols; c++) {
+        rows[r][c] = false;
+      }
+    }
+
+    rows[3][5] = true
+    rows[4][4] = true
+
+    const state = {
+      rows: rows,
+      score: 0
+    }
+
     return (
       <div className="App">
         <header className="App-header">
@@ -44,21 +61,9 @@ class App extends Component {
         <p className="App-intro">
           To get started, edit <code>src/App.js</code> and save to reload.
         </p>
-        <div>
-          <div className="board">
-            <div className="row">
-              <div className="cell"/>
-              <div className="cell on"/>
-              <div className="cell"/>
-            </div>
-            <div className="row">
-              <div className="cell"/>
-              <div className="cell"/>
-              <div className="cell"/>
-            </div>
-          </div>
-        </div>
-        <Board rows="10" cols="8"/>
+
+        <Board rows={state.rows}/>
+        
       </div>
     );
   }
