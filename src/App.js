@@ -2,6 +2,35 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
+function Board(props) {
+  let rows = []
+  for (let i = 0; i < props.rows; i++) {
+    rows.push(<BoardRow key={i} cols={props.cols}/>);
+  }
+  return (
+    <div className="board">
+      {rows}
+    </div>
+  )
+}
+
+function BoardRow(props) {
+  let cells = []
+  for (let i = 0; i < props.cols; i++) {
+    cells.push(<BoardCell key={i}/>);
+  }
+
+  return (
+    <div className="row">
+      {cells}
+    </div>
+  )
+}
+
+function BoardCell(props) {
+  return <div className="cell"/>
+}
+
 class App extends Component {
   render() {
     return (
@@ -27,6 +56,7 @@ class App extends Component {
             </div>
           </div>
         </div>
+        <Board rows="10" cols="8"/>
       </div>
     );
   }
