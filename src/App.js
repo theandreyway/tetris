@@ -50,7 +50,7 @@ class Game extends Component {
 }
 
 const mapStateProps = state => {
-  let board = [...state.board]
+  let board = state.board.map(a => a.map(b => b))
   const p = state.position;
   board[p.row][p.col] = true;
 
@@ -63,7 +63,6 @@ const mapStateProps = state => {
 const mapDisptchToProps = dispatch => {
   return {
     onKeyDown: e => {
-      console.log(e);
       switch (e.key) {
         case "ArrowDown":
           dispatch(moveDown());
