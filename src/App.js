@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect, Provider } from 'react-redux';
-import { store, init } from './redux/actions.js';
+import { store, init, moveDown, moveLeft, moveRight } from './redux/actions.js';
 
 import logo from './logo.svg';
 import './App.css';
@@ -41,7 +41,7 @@ class Game extends Component {
 
   render() {
     return (
-      <div>
+      <div tabIndex={0} onKeyDown={this.props.onKeyDown}>
         <p>seed is {this.props.seed}</p>
         <Board rows={this.props.board} />
       </div>
@@ -50,13 +50,38 @@ class Game extends Component {
 }
 
 const mapStateProps = state => {
+  let board = [...state.board]
+  const p = state.position;
+  board[p.row][p.col] = true;
+
   return {
-    board: state.board,
+    board: board,
     seed: state.seed
   }
 }
 
-const PlayableGame = connect(mapStateProps)(Game)
+const mapDisptchToProps = dispatch => {
+  return {
+    onKeyDown: e => {
+      console.log(e);
+      switch (e.key) {
+        case "ArrowDown":
+          dispatch(moveDown());
+          break;
+        case "ArrowLeft":
+          dispatch(moveLeft());
+          break;
+        case "ArrowRight":
+          dispatch(moveRight());
+          break;
+        default:
+          break;
+      }
+    }
+  }
+}
+
+const PlayableGame = connect(mapStateProps, mapDisptchToProps)(Game)
 
 class App extends Component {
   render() {
