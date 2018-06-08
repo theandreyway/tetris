@@ -1,4 +1,7 @@
 import React, { Component } from 'react';
+import { connect, Provider } from 'react-redux';
+import { store, init } from './redux/actions.js';
+
 import logo from './logo.svg';
 import './App.css';
 
@@ -31,40 +34,47 @@ function BoardCell(props) {
   return <div className={className}/>
 }
 
+class Game extends Component {
+  componentDidMount() {
+    store.dispatch(init(Date.now()));
+  }
+
+  render() {
+    return (
+      <div>
+        <p>seed is {this.props.seed}</p>
+        <Board rows={this.props.board} />
+      </div>
+    )
+  }
+}
+
+const mapStateProps = state => {
+  return {
+    board: state.board,
+    seed: state.seed
+  }
+}
+
+const PlayableGame = connect(mapStateProps)(Game)
+
 class App extends Component {
   render() {
-    const numRows = 12;
-    const numCols = 8;
-
-    let rows = Array(numRows)
-    for (let r = 0; r < numRows; r++) {
-      rows[r] = Array(numCols);
-      for (let c = 0; c < numCols; c++) {
-        rows[r][c] = false;
-      }
-    }
-
-    rows[3][5] = true
-    rows[4][4] = true
-
-    const state = {
-      rows: rows,
-      score: 0
-    }
-
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
+      <Provider store={store}>
+        <div className="App">
+          <header className="App-header">
+            <img src={logo} className="App-logo" alt="logo" />
+            <h1 className="App-title">Welcome to React</h1>
+          </header>
+          <p className="App-intro">
+            To get started, edit <code>src/App.js</code> and save to reload.
+          </p>
 
-        <Board rows={state.rows}/>
-        
-      </div>
+          <PlayableGame/>
+
+        </div>
+      </Provider>
     );
   }
 }
