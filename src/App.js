@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect, Provider } from 'react-redux';
-import { store, init, moveDown, moveLeft, moveRight } from './redux/actions.js';
+import { store, init, moveDown, moveLeft, moveRight, SHAPE_ROTATIONS } from './redux/actions.js';
 
 import logo from './logo.svg';
 import './App.css';
@@ -84,6 +84,7 @@ const PlayableGame = connect(mapStateProps, mapDisptchToProps)(Game)
 
 class App extends Component {
   render() {
+    console.log(SHAPE_ROTATIONS)
     return (
       <Provider store={store}>
         <div className="App">
