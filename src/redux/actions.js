@@ -153,14 +153,17 @@ function makeBlankBoard(numRows, numCols) {
 const initialState = {
   board: makeBlankBoard(20, 10),
   seed: -1,
-  position: {row: 0, col: 5}
+  position: {row: 0, col: 5},
+  shape: [[0]]
 }
 
 function reduceInit(state, seed) {
+  const shape = SHAPE_ROTATIONS[seed % SHAPE_ROTATIONS.length][0];
   return {...state,
     board: makeBlankBoard(20, 10),
     seed: seed,
-    position: { row: 0, col: 5}
+    position: { row: 0, col: 5},
+    shape: shape
   };
 }
 
