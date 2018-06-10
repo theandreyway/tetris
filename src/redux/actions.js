@@ -9,117 +9,210 @@ const ActionType = {
 
 export const SHAPE_ROTATIONS = [
   [
-    [
-      [1, 1],
-      [1, 1]
-    ]
+    {
+      shape:
+      [
+        [1, 1],
+        [1, 1]
+      ],
+      left: 0,
+      right: 0
+    }
   ],
   [
-    [
-      [1, 1, 0],
-      [0, 1, 1],
-      [0, 0, 0]
-    ],
-    [
-      [0, 1, 0],
-      [1, 1, 0],
-      [1, 0, 0]
-    ]
+    {
+      shape:
+      [
+        [1, 1, 0],
+        [0, 1, 1],
+        [0, 0, 0]
+      ],
+      left: 0,
+      right: 0
+    },
+    {
+      shape:
+      [
+        [0, 1, 0],
+        [1, 1, 0],
+        [1, 0, 0]
+      ],
+      left: 0,
+      right: 1
+    }
   ],
   [
-    [
-      [0, 1, 1],
-      [1, 1, 0],
-      [0, 0, 0]
-    ],
-    [
-      [0, 1, 0],
-      [0, 1, 1],
-      [0, 0, 1]
-    ]
+    {
+      shape:  [
+        [0, 1, 1],
+        [1, 1, 0],
+        [0, 0, 0]
+      ],
+      left: 0,
+      right: 0
+    },
+    {
+      shape:
+      [
+        [0, 1, 0],
+        [0, 1, 1],
+        [0, 0, 1]
+      ],
+      left: 1,
+      right: 0
+    }
   ],
   [
-    [
-      [0, 1, 1],
-      [0, 0, 1],
-      [0, 0, 1]
-    ],
-    [
-      [0, 0, 0],
-      [0, 0, 1],
-      [1, 1, 1]
-    ],
-    [
-      [1, 0, 0],
-      [1, 0, 0],
-      [1, 1, 0]
-    ],
-    [
-      [1, 1, 1],
-      [1, 0, 0],
-      [0, 0, 0]
-    ]
+    {
+      shape:
+      [
+        [0, 1, 1],
+        [0, 0, 1],
+        [0, 0, 1]
+      ],
+      left: 1,
+      right: 0
+    },
+    {
+      shape:
+      [
+        [0, 0, 0],
+        [0, 0, 1],
+        [1, 1, 1]
+      ],
+      left: 0,
+      right: 0
+    },
+    {
+      shape:
+      [
+        [1, 0, 0],
+        [1, 0, 0],
+        [1, 1, 0]
+      ],
+      left: 0,
+      right: 1
+    },
+    {
+      shape:
+      [
+        [1, 1, 1],
+        [1, 0, 0],
+        [0, 0, 0]
+      ],
+      left: 0,
+      right: 0
+    }
   ],
   [
-    [
-      [1, 1, 0],
-      [1, 0, 0],
-      [1, 0, 0]
-    ],
-    [
-      [1, 1, 1],
-      [0, 0, 1],
-      [0, 0, 0]
-    ],
-    [
-      [0, 0, 1],
-      [0, 0, 1],
-      [0, 1, 1]
-    ],
-    [
-      [0, 0, 0],
-      [1, 0, 0],
-      [1, 1, 1]
-    ]
+    {
+      shape:
+      [
+        [1, 1, 0],
+        [1, 0, 0],
+        [1, 0, 0]
+      ],
+      left: 0,
+      right: 1
+    },
+    {
+      shape:
+      [
+        [1, 1, 1],
+        [0, 0, 1],
+        [0, 0, 0]
+      ],
+      left: 0,
+      right: 0
+    },
+    {
+      shape:
+      [
+        [0, 0, 1],
+        [0, 0, 1],
+        [0, 1, 1]
+      ],
+      left: 1,
+      right: 0
+    },
+    {
+      shape:
+      [
+        [0, 0, 0],
+        [1, 0, 0],
+        [1, 1, 1]
+      ],
+      left: 0,
+      right: 0
+    }
   ],
   [
-    [
-      [0, 0, 0],
-      [1, 1, 1],
-      [0, 1, 0]
-    ],
-    [
-      [0, 1, 0],
-      [1, 1, 0],
-      [0, 1, 0]
-    ],
-    [
-      [0, 1, 0],
-      [1, 1, 1],
-      [0, 0, 0]
-    ],
-    [
-      [0, 1, 0],
-      [0, 1, 1],
-      [0, 1, 0]
-    ],
-    [
-      [0, 0, 1, 0],
-      [0, 0, 1, 0],
-      [0, 0, 1, 0],
-      [0, 0, 1, 0]
-    ],
-    [
-      [0, 0, 0, 0],
-      [1, 1, 1, 1],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0]
-    ]
+    {
+      shape:
+      [
+        [0, 0, 0],
+        [1, 1, 1],
+        [0, 1, 0]
+      ],
+      left: 0,
+      right: 0
+    },
+    {
+      shape:
+      [
+        [0, 1, 0],
+        [1, 1, 0],
+        [0, 1, 0]
+      ],
+      left: 0,
+      right: 1
+    },
+    {
+      shape:
+      [
+        [0, 1, 0],
+        [1, 1, 1],
+        [0, 0, 0]
+      ],
+      left: 0,
+      right: 0
+    },
+    {
+      shape:
+      [
+        [0, 1, 0],
+        [0, 1, 1],
+        [0, 1, 0]
+      ],
+      left: 1,
+      right: 0
+    }
+  ],
+  [
+    {
+      shape:
+      [
+        [0, 0, 1, 0],
+        [0, 0, 1, 0],
+        [0, 0, 1, 0],
+        [0, 0, 1, 0]
+      ],
+      left: 2,
+      right: 1
+    },
+    {
+      shape:
+      [
+        [0, 0, 0, 0],
+        [1, 1, 1, 1],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0]
+      ],
+      left: 0,
+      right: 0
+    }
   ]
-].map(shape =>
-  shape.map(rotation =>
-    rotation.map(row =>
-      row.map(col => col === 1))));
+];
 
 export function init(seed) {
   return { type: ActionType.INIT, seed: seed };
@@ -154,10 +247,15 @@ const initialState = {
   board: makeBlankBoard(20, 10),
   seed: -1,
   position: {row: 0, col: 5},
-  shape: [[0]]
+  shape: {
+    shape: [[0]],
+    left: 0,
+    right: 0
+  }
 }
 
 function reduceInit(state, seed) {
+  console.log(SHAPE_ROTATIONS.length, seed % SHAPE_ROTATIONS.length);
   const shape = SHAPE_ROTATIONS[seed % SHAPE_ROTATIONS.length][0];
   return {...state,
     board: makeBlankBoard(20, 10),
@@ -181,8 +279,9 @@ function reduceMoveDown(state) {
 function reduceMoveLeft(state) {
   const row = state.position.row;
 
+  const left = state.shape.left;
   const prevCol = state.position.col;
-  const col = prevCol === 0 ? prevCol : prevCol - 1;
+  const col = prevCol + left === 0 ? prevCol : prevCol - 1;
 
   return {...state,
     position: {row: row, col: col}
@@ -192,8 +291,12 @@ function reduceMoveLeft(state) {
 function reduceMoveRight(state) {
   const row = state.position.row;
 
+  const right = state.shape.right;
+  const width = state.shape.shape[0].length;
   const prevCol = state.position.col;
-  const col = prevCol === state.board[0].length - 1 ? prevCol : prevCol + 1;
+
+  const col = prevCol + width - right < state.board[0].length ?
+    prevCol + 1 : prevCol;
 
   return {...state,
     position: {row: row, col: col}

@@ -51,11 +51,14 @@ class Game extends Component {
 
 const mapStateProps = state => {
   let board = state.board.map(a => a.map(b => b))
-  const shape = state.shape;
 
+  const shape = state.shape.shape;
+  const left = state.shape.left;
+  const right = state.shape.right;
   const p = state.position;
+
   for (let r = 0; r < shape.length; r++) {
-    for (let c = 0; c < shape[0].length; c++) {
+    for (let c = left; c < shape[0].length - right; c++) {
       board[p.row + r][p.col + c] = shape[r][c];
     }
   }
@@ -90,7 +93,6 @@ const PlayableGame = connect(mapStateProps, mapDisptchToProps)(Game)
 
 class App extends Component {
   render() {
-    console.log(SHAPE_ROTATIONS)
     return (
       <Provider store={store}>
         <div className="App">
