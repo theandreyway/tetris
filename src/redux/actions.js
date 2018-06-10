@@ -15,6 +15,7 @@ export const SHAPE_ROTATIONS = [
         [1, 1],
         [1, 1]
       ],
+      top: 0,
       left: 0,
       right: 0
     }
@@ -27,6 +28,7 @@ export const SHAPE_ROTATIONS = [
         [0, 1, 1],
         [0, 0, 0]
       ],
+      top: 0,
       left: 0,
       right: 0
     },
@@ -37,6 +39,7 @@ export const SHAPE_ROTATIONS = [
         [1, 1, 0],
         [1, 0, 0]
       ],
+      top: 0,
       left: 0,
       right: 1
     }
@@ -48,6 +51,7 @@ export const SHAPE_ROTATIONS = [
         [1, 1, 0],
         [0, 0, 0]
       ],
+      top: 0,
       left: 0,
       right: 0
     },
@@ -58,6 +62,7 @@ export const SHAPE_ROTATIONS = [
         [0, 1, 1],
         [0, 0, 1]
       ],
+      top: 0,
       left: 1,
       right: 0
     }
@@ -70,6 +75,7 @@ export const SHAPE_ROTATIONS = [
         [0, 0, 1],
         [0, 0, 1]
       ],
+      top: 0,
       left: 1,
       right: 0
     },
@@ -80,6 +86,7 @@ export const SHAPE_ROTATIONS = [
         [0, 0, 1],
         [1, 1, 1]
       ],
+      top: 1,
       left: 0,
       right: 0
     },
@@ -90,6 +97,7 @@ export const SHAPE_ROTATIONS = [
         [1, 0, 0],
         [1, 1, 0]
       ],
+      top: 0,
       left: 0,
       right: 1
     },
@@ -100,6 +108,7 @@ export const SHAPE_ROTATIONS = [
         [1, 0, 0],
         [0, 0, 0]
       ],
+      top: 0,
       left: 0,
       right: 0
     }
@@ -112,6 +121,7 @@ export const SHAPE_ROTATIONS = [
         [1, 0, 0],
         [1, 0, 0]
       ],
+      top: 0,
       left: 0,
       right: 1
     },
@@ -122,6 +132,7 @@ export const SHAPE_ROTATIONS = [
         [0, 0, 1],
         [0, 0, 0]
       ],
+      top: 0,
       left: 0,
       right: 0
     },
@@ -132,6 +143,7 @@ export const SHAPE_ROTATIONS = [
         [0, 0, 1],
         [0, 1, 1]
       ],
+      top: 0,
       left: 1,
       right: 0
     },
@@ -142,6 +154,7 @@ export const SHAPE_ROTATIONS = [
         [1, 0, 0],
         [1, 1, 1]
       ],
+      top: 0,
       left: 0,
       right: 0
     }
@@ -154,6 +167,7 @@ export const SHAPE_ROTATIONS = [
         [1, 1, 1],
         [0, 1, 0]
       ],
+      top: 1,
       left: 0,
       right: 0
     },
@@ -164,6 +178,7 @@ export const SHAPE_ROTATIONS = [
         [1, 1, 0],
         [0, 1, 0]
       ],
+      top: 0,
       left: 0,
       right: 1
     },
@@ -174,6 +189,7 @@ export const SHAPE_ROTATIONS = [
         [1, 1, 1],
         [0, 0, 0]
       ],
+      top: 0,
       left: 0,
       right: 0
     },
@@ -184,6 +200,7 @@ export const SHAPE_ROTATIONS = [
         [0, 1, 1],
         [0, 1, 0]
       ],
+      top: 0,
       left: 1,
       right: 0
     }
@@ -197,6 +214,7 @@ export const SHAPE_ROTATIONS = [
         [0, 0, 1, 0],
         [0, 0, 1, 0]
       ],
+      top: 0,
       left: 2,
       right: 1
     },
@@ -208,6 +226,7 @@ export const SHAPE_ROTATIONS = [
         [0, 0, 0, 0],
         [0, 0, 0, 0]
       ],
+      top: 1,
       left: 0,
       right: 0
     }
@@ -260,7 +279,7 @@ function reduceInit(state, seed) {
   return {...state,
     board: makeBlankBoard(20, 10),
     seed: seed,
-    position: { row: 0, col: 5},
+    position: { row: 0 - shape.top, col: 5},
     shape: shape
   };
 }
