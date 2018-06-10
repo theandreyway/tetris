@@ -59,9 +59,10 @@ const mapStateProps = state => {
   const top = state.shape.top;
   const left = state.shape.left;
   const right = state.shape.right;
+  const bottom = state.shape.bottom;
   const p = state.position;
 
-  for (let r = top; r < shape.length; r++) {
+  for (let r = top; r < shape.length - bottom; r++) {
     for (let c = left; c < shape[0].length - right; c++) {
       board[p.row + r][p.col + c] = shape[r][c];
     }

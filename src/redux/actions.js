@@ -10,7 +10,8 @@ export const SHAPE_ROTATIONS = [
       ],
       top: 0,
       left: 0,
-      right: 0
+      right: 0,
+      bottom: 0
     }
   ],
   [
@@ -23,7 +24,8 @@ export const SHAPE_ROTATIONS = [
       ],
       top: 0,
       left: 0,
-      right: 0
+      right: 0,
+      bottom: 1
     },
     {
       shape:
@@ -34,7 +36,8 @@ export const SHAPE_ROTATIONS = [
       ],
       top: 0,
       left: 0,
-      right: 1
+      right: 1,
+      bottom: 0
     }
   ],
   [
@@ -46,7 +49,8 @@ export const SHAPE_ROTATIONS = [
       ],
       top: 0,
       left: 0,
-      right: 0
+      right: 0,
+      bottom: 1
     },
     {
       shape:
@@ -57,7 +61,8 @@ export const SHAPE_ROTATIONS = [
       ],
       top: 0,
       left: 1,
-      right: 0
+      right: 0,
+      bottom: 0
     }
   ],
   [
@@ -70,7 +75,8 @@ export const SHAPE_ROTATIONS = [
       ],
       top: 0,
       left: 1,
-      right: 0
+      right: 0,
+      bottom: 0
     },
     {
       shape:
@@ -81,7 +87,8 @@ export const SHAPE_ROTATIONS = [
       ],
       top: 1,
       left: 0,
-      right: 0
+      right: 0,
+      bottom: 0
     },
     {
       shape:
@@ -92,7 +99,8 @@ export const SHAPE_ROTATIONS = [
       ],
       top: 0,
       left: 0,
-      right: 1
+      right: 1,
+      bottom: 0
     },
     {
       shape:
@@ -103,7 +111,8 @@ export const SHAPE_ROTATIONS = [
       ],
       top: 0,
       left: 0,
-      right: 0
+      right: 0,
+      bottom: 1
     }
   ],
   [
@@ -116,7 +125,8 @@ export const SHAPE_ROTATIONS = [
       ],
       top: 0,
       left: 0,
-      right: 1
+      right: 1,
+      bottom: 0
     },
     {
       shape:
@@ -127,7 +137,8 @@ export const SHAPE_ROTATIONS = [
       ],
       top: 0,
       left: 0,
-      right: 0
+      right: 0,
+      bottom: 1
     },
     {
       shape:
@@ -138,7 +149,8 @@ export const SHAPE_ROTATIONS = [
       ],
       top: 0,
       left: 1,
-      right: 0
+      right: 0,
+      bottom: 0
     },
     {
       shape:
@@ -149,7 +161,8 @@ export const SHAPE_ROTATIONS = [
       ],
       top: 1,
       left: 0,
-      right: 0
+      right: 0,
+      bottom: 0
     }
   ],
   [
@@ -162,7 +175,8 @@ export const SHAPE_ROTATIONS = [
       ],
       top: 1,
       left: 0,
-      right: 0
+      right: 0,
+      bottom: 0
     },
     {
       shape:
@@ -173,7 +187,8 @@ export const SHAPE_ROTATIONS = [
       ],
       top: 0,
       left: 0,
-      right: 1
+      right: 1,
+      bottom: 0
     },
     {
       shape:
@@ -184,7 +199,8 @@ export const SHAPE_ROTATIONS = [
       ],
       top: 0,
       left: 0,
-      right: 0
+      right: 0,
+      bottom: 1
     },
     {
       shape:
@@ -195,7 +211,8 @@ export const SHAPE_ROTATIONS = [
       ],
       top: 0,
       left: 1,
-      right: 0
+      right: 0,
+      bottom: 0
     }
   ],
   [
@@ -209,7 +226,8 @@ export const SHAPE_ROTATIONS = [
       ],
       top: 0,
       left: 2,
-      right: 1
+      right: 1,
+      bottom: 0
     },
     {
       shape:
@@ -221,7 +239,8 @@ export const SHAPE_ROTATIONS = [
       ],
       top: 1,
       left: 0,
-      right: 0
+      right: 0,
+      bottom: 2
     }
   ]
 ];
@@ -275,7 +294,8 @@ const initialState = {
     shape: [[0]],
     top: 0,
     left: 0,
-    right: 0
+    right: 0,
+    bottom: 0
   },
   shapeIndex: -1,
   rotationIndex: 0
@@ -316,7 +336,11 @@ function reduceInit(state, seed) {
 
 function reduceMoveDown(state) {
   const prevRow = state.position.row;
-  const row = prevRow === state.board.length - 1 ? prevRow : prevRow + 1;
+  const boardLength = state.board.length;
+  const shapeLength = state.shape.shape.length;
+  const bottom = state.shape.bottom;
+  const maxRow = boardLength - shapeLength + bottom;
+  const row = prevRow < maxRow ? prevRow + 1 : prevRow;
 
   const col = state.position.col;
 
@@ -357,6 +381,11 @@ function reduceRotateRight(state) {
   const numRotations = SHAPE_ROTATIONS[shapeIndex].length;
   const rotationIndex = (state.rotationIndex + 1) % numRotations;
   const shape = SHAPE_ROTATIONS[shapeIndex][rotationIndex];
+
+  // ignore rotation if it would make the shape go below the board
+  if (state.position.row + shape.shape.length - shape.bottom > state.board.length) {
+    return state;
+  }
 
   const boardWidth = state.board[0].length;
   const shapeWidth = shape.shape[0].length;
