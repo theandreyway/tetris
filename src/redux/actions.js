@@ -154,7 +154,7 @@ export const SHAPE_ROTATIONS = [
         [1, 0, 0],
         [1, 1, 1]
       ],
-      top: 0,
+      top: 1,
       left: 0,
       right: 0
     }
@@ -268,19 +268,34 @@ const initialState = {
   position: {row: 0, col: 5},
   shape: {
     shape: [[0]],
+    top: 0,
     left: 0,
     right: 0
-  }
+  },
+  shapeIndex: -1,
+  rotationIndex: 0
 }
 
 function reduceInit(state, seed) {
-  console.log(SHAPE_ROTATIONS.length, seed % SHAPE_ROTATIONS.length);
-  const shape = SHAPE_ROTATIONS[seed % SHAPE_ROTATIONS.length][0];
+  const board = makeBlankBoard(20, 10);
+
+  const shapeIndex = seed % SHAPE_ROTATIONS.length;
+  const rotations = SHAPE_ROTATIONS[shapeIndex];
+  const rotationIndex = (seed % 13) % rotations.length;
+  const shape = rotations[rotationIndex];
+
+  const row = 0 - shape.top;
+  const col = Math.trunc(
+    (board[0].length - shape.shape[0].length - shape.left + shape.right + 1) / 2);
+  console.log(col);
+
   return {...state,
-    board: makeBlankBoard(20, 10),
+    board: board,
     seed: seed,
-    position: { row: 0 - shape.top, col: 5},
-    shape: shape
+    position: { row: row, col: col },
+    shape: shape,
+    shapeIndex: shapeIndex,
+    rotationIndex: rotationIndex
   };
 }
 
