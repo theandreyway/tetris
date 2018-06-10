@@ -1,12 +1,5 @@
 import { createStore } from "redux"
 
-const ActionType = {
-  INIT: "INIT",
-  MOVE_DOWN: "MOVE_DOWN",
-  MOVE_LEFT: "MOVE_LEFT",
-  MOVE_RIGHT: "MOVE_RIGHT"
-}
-
 export const SHAPE_ROTATIONS = [
   [
     {
@@ -233,6 +226,14 @@ export const SHAPE_ROTATIONS = [
   ]
 ];
 
+const ActionType = {
+  INIT: "INIT",
+  MOVE_DOWN: "MOVE_DOWN",
+  MOVE_LEFT: "MOVE_LEFT",
+  MOVE_RIGHT: "MOVE_RIGHT",
+  ROTATE_RIGHT: "ROTATE_RIGHT"
+}
+
 export function init(seed) {
   return { type: ActionType.INIT, seed: seed };
 }
@@ -247,6 +248,10 @@ export function moveLeft() {
 
 export function moveRight() {
   return { type: ActionType.MOVE_RIGHT };
+}
+
+export function rotateRight() {
+  return { type: ActionType.ROTATE_RIGHT };
 }
 
 
@@ -276,6 +281,16 @@ const initialState = {
   rotationIndex: 0
 }
 
+// Using the first set of numbers from the table in
+// https://en.wikipedia.org/wiki/Linear_congruential_generator
+function nextSeed(seed) {
+  const a = 1664525;
+  const c = 1013904223;
+  const m = 2 ** 32;
+
+  return (a * seed + c) % m;
+}
+
 function reduceInit(state, seed) {
   const board = makeBlankBoard(20, 10);
 
@@ -291,7 +306,7 @@ function reduceInit(state, seed) {
 
   return {...state,
     board: board,
-    seed: seed,
+    seed: nextSeed(seed),
     position: { row: row, col: col },
     shape: shape,
     shapeIndex: shapeIndex,
@@ -337,6 +352,38 @@ function reduceMoveRight(state) {
   }
 }
 
+function reduceRotateRight(state) {
+  const shapeIndex = state.shapeIndex;
+  const numRotations = SHAPE_ROTATIONS[shapeIndex].length;
+  const rotationIndex = (state.rotationIndex + 1) % numRotations;
+  const shape = SHAPE_ROTATIONS[shapeIndex][rotationIndex];
+
+  const boardWidth = state.board[0].length;
+  const shapeWidth = shape.shape[0].length;
+
+  // kick back on left
+  let col = state.position.col;
+
+  // this only works because all of the kick back shapes are fully
+  // wide on the next rotation.  The logic would have to be updated
+  // if shapes weren't this special.
+  if (col < 0) {
+    col = 0;
+  }
+  // kick back on right
+  else if (col > boardWidth - shapeWidth) {
+    col = boardWidth - shapeWidth;
+  }
+
+  // TODO: check for collision and don't rotate the shape if there is one.
+  return {
+    ...state,
+    shape: shape,
+    rotationIndex: rotationIndex,
+    position: {row: state.position.row, col: col}
+  }
+}
+
 function game(state = initialState, action) {
   switch (action.type) {
     case ActionType.INIT:
@@ -347,6 +394,8 @@ function game(state = initialState, action) {
       return reduceMoveLeft(state);
     case ActionType.MOVE_RIGHT:
       return reduceMoveRight(state);
+    case ActionType.ROTATE_RIGHT:
+      return reduceRotateRight(state);
     default:
       return state;
   }
