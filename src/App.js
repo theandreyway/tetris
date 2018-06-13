@@ -41,6 +41,7 @@ function BoardCell(props) {
 class Game extends Component {
   componentDidMount() {
     store.dispatch(init(Date.now()));
+    setInterval(() => store.dispatch(moveDown()), 500);
   }
 
   render() {
