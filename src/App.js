@@ -104,4 +104,14 @@ class App extends Component {
   }
 }
 
+/*
+TODO:
+Speed up side to side
+increase speed with score
+preview next shape
+display game over
+make background grid square borders lighter
+make shape blocks prettier
+*/
+
 export default App;
