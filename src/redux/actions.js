@@ -297,8 +297,10 @@ const initialState = {
     right: 0,
     bottom: 0
   },
-  shapeIndex: -1,
-  rotationIndex: 0
+  shapeIndex: 0,
+  rotationIndex: 0,
+  isColision: false,
+  score: 0
 }
 
 // Using the first set of numbers from the table in
@@ -322,7 +324,6 @@ function reduceInit(state, seed) {
   const row = 0 - shape.top;
   const col = Math.trunc(
     (board[0].length - shape.shape[0].length - shape.left + shape.right + 1) / 2);
-  console.log(col);
 
   return {...state,
     board: board,
@@ -344,8 +345,12 @@ function reduceMoveDown(state) {
 
   const col = state.position.col;
 
+  // TODO: check for colision with shapes
+
   return {...state,
-    position: {row: row, col: col}
+    position: {row: row, col: col},
+    // it's a colision if the block didn't move down.
+    isColision: state.position.row === row
   }
 }
 
@@ -418,7 +423,43 @@ function reduceRotateRight(state) {
   }
 }
 
+function addShapeToBoard(originalBoard, shape, position) {
+  let board = originalBoard.map(a => a.map(b => b))
+
+  for (let r = shape.top; r < shape.shape.length - shape.bottom; r++) {
+    for (let c = shape.left; c < shape.shape[0].length - shape.right; c++) {
+      board[position.row + r][position.col + c] = shape.shape[r][c];
+    }
+  }
+
+  return board;
+}
+
+function clearCompleteRows(board) {
+  const cleared = board.filter(row => row.reduce(
+    (acc, val) => {return acc && val}, true));
+  const rowsCleared = board.length - cleared.length;
+
+  if (rowsCleared == 0) {
+    return board;
+  } else {
+    const newRows = makeBlankBoard(rowsCleared, board[0].length);
+    return [[...newRows, ...cleared], rowsCleared];
+  }
+}
+
 function game(state = initialState, action) {
+  if (state.isColision) {
+    const shape = SHAPE_ROTATIONS[state.shapeIndex][state.rotationIndex];
+    const colided = addShapeToBoard(state.board, shape, state.position);
+    const [cleared, rowsCleared] = clearCompleteRows(colided);
+    return {
+      ...state,
+      board: cleared,
+      score: state.score + rowsCleared
+    }
+  }
+
   switch (action.type) {
     case ActionType.INIT:
       return reduceInit(state, action.seed);
@@ -435,27 +476,13 @@ function game(state = initialState, action) {
   }
 }
 
-export const store = createStore(game)
-
+export const store = createStore(game);
 
 export const mapStateProps = state => {
-  let board = state.board.map(a => a.map(b => b))
-
-  const shape = state.shape.shape;
-  const top = state.shape.top;
-  const left = state.shape.left;
-  const right = state.shape.right;
-  const bottom = state.shape.bottom;
-  const p = state.position;
-
-  for (let r = top; r < shape.length - bottom; r++) {
-    for (let c = left; c < shape[0].length - right; c++) {
-      board[p.row + r][p.col + c] = shape[r][c];
-    }
-  }
+  const shape = SHAPE_ROTATIONS[state.shapeIndex][state.rotationIndex];
 
   return {
-    board: board,
+    board: addShapeToBoard(state.board, shape, state.position),
     seed: state.seed
   }
 }
