@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import { connect, Provider } from 'react-redux';
 import { store,
   init,
-  moveDown, moveLeft, moveRight,
+  moveDown, drop,
+  moveLeft, moveRight,
   rotateRight, mapStateProps
 } from './redux/actions.js';
 
@@ -69,6 +70,9 @@ const mapDisptchToProps = dispatch => {
           break;
         case "ArrowUp":
           dispatch(rotateRight());
+          break;
+        case " ":
+          dispatch(drop());
           break;
         default:
           break;

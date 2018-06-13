@@ -250,7 +250,8 @@ const ActionType = {
   MOVE_DOWN: "MOVE_DOWN",
   MOVE_LEFT: "MOVE_LEFT",
   MOVE_RIGHT: "MOVE_RIGHT",
-  ROTATE_RIGHT: "ROTATE_RIGHT"
+  ROTATE_RIGHT: "ROTATE_RIGHT",
+  DROP: "DROP"
 }
 
 export function init(seed) {
@@ -273,6 +274,9 @@ export function rotateRight() {
   return { type: ActionType.ROTATE_RIGHT };
 }
 
+export function drop() {
+  return { type: ActionType.DROP };
+}
 
 function makeBlankBoard(numRows, numCols) {
   let rows = Array(numRows)
@@ -292,7 +296,7 @@ const initialState = {
   position: {row: 0, col: 5},
   shapeIndex: 0,
   rotationIndex: 0,
-  isColision: false,
+  isCollision: false,
   isGameOver: false,
   score: 0
 }
@@ -358,8 +362,16 @@ function reduceMoveDown(state) {
   return {...state,
     position: isCollision ? state.position : position,
     // it's a colision if the block didn't move down.
-    isColision: isCollision || state.position.row === row
+    isCollision: isCollision || state.position.row === row
   }
+}
+
+function reduceDrop(state) {
+  let newState = state;
+  while (!newState.isCollision) {
+    newState = reduceMoveDown(newState);
+  }
+  return newState;
 }
 
 function reduceMoveLeft(state) {
@@ -427,9 +439,9 @@ function reduceRotateRight(state) {
   }
 
   const position = {row: row, col: col};
-  const isColision = checkForCollision(state.board, shape, position);
+  const isCollision = checkForCollision(state.board, shape, position);
 
-  return isColision ? state : {
+  return isCollision ? state : {
     ...state,
     rotationIndex: rotationIndex,
     position: position
@@ -482,7 +494,7 @@ function game(state = initialState, action) {
   }
 
   const newState = reduceAction(state, action);
-  return newState.isColision ? reduceCollision(newState) : newState;
+  return newState.isCollision ? reduceCollision(newState) : newState;
 }
 
 function reduceCollision(state) {
@@ -492,7 +504,7 @@ function reduceCollision(state) {
     ...state,
     board: cleared,
     score: state.score + rowsCleared,
-    isColision: false
+    isCollision: false
   });
 }
 
@@ -508,6 +520,8 @@ function reduceAction(state, action) {
       return reduceMoveRight(state);
     case ActionType.ROTATE_RIGHT:
       return reduceRotateRight(state);
+    case ActionType.DROP:
+      return reduceDrop(state);
     default:
       return state;
   }
