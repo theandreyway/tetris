@@ -426,11 +426,13 @@ function reduceRotateRight(state) {
     row = -1 * shape.top;
   }
 
-  // TODO: check for collision and don't rotate the shape if there is one.
-  return {
+  const position = {row: row, col: col};
+  const isColision = checkForCollision(state.board, shape, position);
+
+  return isColision ? state : {
     ...state,
     rotationIndex: rotationIndex,
-    position: {row: row, col: col}
+    position: position
   }
 }
 
