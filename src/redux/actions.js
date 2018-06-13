@@ -279,7 +279,7 @@ function makeBlankBoard(numRows, numCols) {
   for (let r = 0; r < numRows; r++) {
     rows[r] = Array(numCols);
     for (let c = 0; c < numCols; c++) {
-      rows[r][c] = false;
+      rows[r][c] = 0;
     }
   }
 
@@ -290,13 +290,6 @@ const initialState = {
   board: makeBlankBoard(20, 10),
   seed: -1,
   position: {row: 0, col: 5},
-  shape: {
-    shape: [[0]],
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0
-  },
   shapeIndex: 0,
   rotationIndex: 0,
   isColision: false,
@@ -313,33 +306,42 @@ function nextSeed(seed) {
   return (a * seed + c) % m;
 }
 
-function reduceInit(state, seed) {
-  const board = makeBlankBoard(20, 10);
+function getShape(state) {
+  return SHAPE_ROTATIONS[state.shapeIndex][state.rotationIndex];
+}
 
-  const shapeIndex = seed % SHAPE_ROTATIONS.length;
-  const rotations = SHAPE_ROTATIONS[shapeIndex];
-  const rotationIndex = (seed % 13) % rotations.length;
-  const shape = rotations[rotationIndex];
+function reduceNextShape(state) {
+  const shapeIndex = state.seed % SHAPE_ROTATIONS.length;
+  const rotationIndex = (state.seed % 13) % SHAPE_ROTATIONS[shapeIndex].length;
+  const shape = SHAPE_ROTATIONS[shapeIndex][rotationIndex];
 
   const row = 0 - shape.top;
   const col = Math.trunc(
-    (board[0].length - shape.shape[0].length - shape.left + shape.right + 1) / 2);
+    (state.board[0].length - shape.shape[0].length
+      - shape.left + shape.right + 1) / 2);
 
-  return {...state,
-    board: board,
-    seed: nextSeed(seed),
-    position: { row: row, col: col },
-    shape: shape,
+  return {
+    ...state,
     shapeIndex: shapeIndex,
-    rotationIndex: rotationIndex
-  };
+    rotationIndex: rotationIndex,
+    seed: nextSeed(state.seed),
+    position: { row: row, col: col },
+  }
+}
+
+function reduceInit(state, seed) {
+  return reduceNextShape({...state,
+    board: makeBlankBoard(20, 10),
+    seed: seed
+  });
 }
 
 function reduceMoveDown(state) {
   const prevRow = state.position.row;
   const boardLength = state.board.length;
-  const shapeLength = state.shape.shape.length;
-  const bottom = state.shape.bottom;
+  const shape = getShape(state);
+  const shapeLength = shape.shape.length;
+  const bottom = shape.bottom;
   const maxRow = boardLength - shapeLength + bottom;
   const row = prevRow < maxRow ? prevRow + 1 : prevRow;
 
@@ -356,8 +358,7 @@ function reduceMoveDown(state) {
 
 function reduceMoveLeft(state) {
   const row = state.position.row;
-
-  const left = state.shape.left;
+  const left = getShape(state).left;
   const prevCol = state.position.col;
   const col = prevCol + left === 0 ? prevCol : prevCol - 1;
 
@@ -369,8 +370,9 @@ function reduceMoveLeft(state) {
 function reduceMoveRight(state) {
   const row = state.position.row;
 
-  const right = state.shape.right;
-  const width = state.shape.shape[0].length;
+  const shape = getShape(state);
+  const right = shape.right;
+  const width = shape.shape[0].length;
   const prevCol = state.position.col;
 
   const col = prevCol + width - right < state.board[0].length ?
@@ -417,7 +419,6 @@ function reduceRotateRight(state) {
   // TODO: check for collision and don't rotate the shape if there is one.
   return {
     ...state,
-    shape: shape,
     rotationIndex: rotationIndex,
     position: {row: row, col: col}
   }
@@ -428,7 +429,9 @@ function addShapeToBoard(originalBoard, shape, position) {
 
   for (let r = shape.top; r < shape.shape.length - shape.bottom; r++) {
     for (let c = shape.left; c < shape.shape[0].length - shape.right; c++) {
-      board[position.row + r][position.col + c] = shape.shape[r][c];
+      if (shape.shape[r][c]) {
+        board[position.row + r][position.col + c] = 1;
+      }
     }
   }
 
@@ -436,12 +439,13 @@ function addShapeToBoard(originalBoard, shape, position) {
 }
 
 function clearCompleteRows(board) {
-  const cleared = board.filter(row => row.reduce(
-    (acc, val) => {return acc && val}, true));
+  const cleared = board.filter(row => !row.reduce(
+    (acc, val) => {return acc && val === 1}, true));
+  console.log(cleared);
   const rowsCleared = board.length - cleared.length;
 
-  if (rowsCleared == 0) {
-    return board;
+  if (rowsCleared === 0) {
+    return [board, 0];
   } else {
     const newRows = makeBlankBoard(rowsCleared, board[0].length);
     return [[...newRows, ...cleared], rowsCleared];
@@ -450,14 +454,14 @@ function clearCompleteRows(board) {
 
 function game(state = initialState, action) {
   if (state.isColision) {
-    const shape = SHAPE_ROTATIONS[state.shapeIndex][state.rotationIndex];
-    const colided = addShapeToBoard(state.board, shape, state.position);
+    const colided = addShapeToBoard(state.board, getShape(state), state.position);
     const [cleared, rowsCleared] = clearCompleteRows(colided);
-    return {
+    return reduceNextShape({
       ...state,
       board: cleared,
-      score: state.score + rowsCleared
-    }
+      score: state.score + rowsCleared,
+      isColision: false
+    });
   }
 
   switch (action.type) {
@@ -479,10 +483,8 @@ function game(state = initialState, action) {
 export const store = createStore(game);
 
 export const mapStateProps = state => {
-  const shape = SHAPE_ROTATIONS[state.shapeIndex][state.rotationIndex];
-
   return {
-    board: addShapeToBoard(state.board, shape, state.position),
+    board: addShapeToBoard(state.board, getShape(state), state.position),
     seed: state.seed
   }
 }
