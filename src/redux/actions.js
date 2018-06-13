@@ -360,13 +360,16 @@ function reduceMoveDown(state) {
 
 function reduceMoveLeft(state) {
   const row = state.position.row;
-  const left = getShape(state).left;
+
+  const shape = getShape(state);
+  const left = shape.left;
   const prevCol = state.position.col;
   const col = prevCol + left === 0 ? prevCol : prevCol - 1;
 
-  return {...state,
-    position: {row: row, col: col}
-  }
+  const position = {row: row, col: col};
+  const isCollision = checkForCollision(state.board, shape, position);
+
+  return isCollision ? state : { ...state, position: position };
 }
 
 function reduceMoveRight(state) {
@@ -380,9 +383,10 @@ function reduceMoveRight(state) {
   const col = prevCol + width - right < state.board[0].length ?
     prevCol + 1 : prevCol;
 
-  return {...state,
-    position: {row: row, col: col}
-  }
+  const position = {row: row, col: col};
+  const isCollision = checkForCollision(state.board, shape, position);
+
+  return isCollision ? state : { ...state, position: position };
 }
 
 function reduceRotateRight(state) {
@@ -456,7 +460,6 @@ function checkForCollision(originalBoard, shape, position) {
 function clearCompleteRows(board) {
   const cleared = board.filter(row => !row.reduce(
     (acc, val) => {return acc && val === 1}, true));
-  console.log(cleared);
   const rowsCleared = board.length - cleared.length;
 
   if (rowsCleared === 0) {
