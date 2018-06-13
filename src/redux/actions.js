@@ -293,6 +293,7 @@ const initialState = {
   shapeIndex: 0,
   rotationIndex: 0,
   isColision: false,
+  isGameOver: false,
   score: 0
 }
 
@@ -320,12 +321,15 @@ function reduceNextShape(state) {
     (state.board[0].length - shape.shape[0].length
       - shape.left + shape.right + 1) / 2);
 
+  const position = { row: row, col: col };
+
   return {
     ...state,
     shapeIndex: shapeIndex,
     rotationIndex: rotationIndex,
     seed: nextSeed(state.seed),
-    position: { row: row, col: col },
+    position: position,
+    isGameOver: checkForCollision(state.board, shape, position)
   }
 }
 
@@ -471,6 +475,10 @@ function clearCompleteRows(board) {
 }
 
 function game(state = initialState, action) {
+  if (state.isGameOver) {
+    return state;
+  }
+
   const newState = reduceAction(state, action);
   return newState.isColision ? reduceCollision(newState) : newState;
 }
