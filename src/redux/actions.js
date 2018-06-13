@@ -339,20 +339,22 @@ function reduceInit(state, seed) {
 function reduceMoveDown(state) {
   const prevRow = state.position.row;
   const boardLength = state.board.length;
+
   const shape = getShape(state);
   const shapeLength = shape.shape.length;
   const bottom = shape.bottom;
+
   const maxRow = boardLength - shapeLength + bottom;
   const row = prevRow < maxRow ? prevRow + 1 : prevRow;
 
   const col = state.position.col;
-
-  // TODO: check for colision with shapes
+  const position = {row: row, col: col};
+  const isCollision = checkForCollision(state.board, shape, position);
 
   return {...state,
-    position: {row: row, col: col},
+    position: isCollision ? state.position : position,
     // it's a colision if the block didn't move down.
-    isColision: state.position.row === row
+    isColision: isCollision || state.position.row === row
   }
 }
 
@@ -424,18 +426,31 @@ function reduceRotateRight(state) {
   }
 }
 
-function addShapeToBoard(originalBoard, shape, position) {
+function addShapeToBoardAndCheckForCollision(originalBoard, shape, position) {
   let board = originalBoard.map(a => a.map(b => b))
+  let isCollision = false;
 
   for (let r = shape.top; r < shape.shape.length - shape.bottom; r++) {
     for (let c = shape.left; c < shape.shape[0].length - shape.right; c++) {
       if (shape.shape[r][c]) {
-        board[position.row + r][position.col + c] = 1;
+        if(board[position.row + r][position.col + c]) {
+          isCollision = true;
+        } else {
+          board[position.row + r][position.col + c] = 1;
+        }
       }
     }
   }
 
-  return board;
+  return [board, isCollision];
+}
+
+function addShapeToBoard(originalBoard, shape, position) {
+  return addShapeToBoardAndCheckForCollision(originalBoard, shape, position)[0];
+}
+
+function checkForCollision(originalBoard, shape, position) {
+  return addShapeToBoardAndCheckForCollision(originalBoard, shape, position)[1];
 }
 
 function clearCompleteRows(board) {
