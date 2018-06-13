@@ -390,18 +390,23 @@ function reduceRotateRight(state) {
   const boardWidth = state.board[0].length;
   const shapeWidth = shape.shape[0].length;
 
-  // kick back on left
+  // left/right kick backs
   let col = state.position.col;
 
-  // this only works because all of the kick back shapes are fully
-  // wide on the next rotation.  The logic would have to be updated
-  // if shapes weren't this special.
-  if (col < 0) {
+  // kick back on left
+  if (col + shape.left < 0) {
     col = 0;
   }
   // kick back on right
-  else if (col > boardWidth - shapeWidth) {
+  else if (col + shapeWidth - shape.right > boardWidth - 1) {
     col = boardWidth - shapeWidth;
+  }
+
+  // kick down at the top
+  let row = state.position.row;
+
+  if (row + shape.top < 0) {
+    row = -1 * shape.top;
   }
 
   // TODO: check for collision and don't rotate the shape if there is one.
@@ -409,7 +414,7 @@ function reduceRotateRight(state) {
     ...state,
     shape: shape,
     rotationIndex: rotationIndex,
-    position: {row: state.position.row, col: col}
+    position: {row: row, col: col}
   }
 }
 
@@ -431,3 +436,26 @@ function game(state = initialState, action) {
 }
 
 export const store = createStore(game)
+
+
+export const mapStateProps = state => {
+  let board = state.board.map(a => a.map(b => b))
+
+  const shape = state.shape.shape;
+  const top = state.shape.top;
+  const left = state.shape.left;
+  const right = state.shape.right;
+  const bottom = state.shape.bottom;
+  const p = state.position;
+
+  for (let r = top; r < shape.length - bottom; r++) {
+    for (let c = left; c < shape[0].length - right; c++) {
+      board[p.row + r][p.col + c] = shape[r][c];
+    }
+  }
+
+  return {
+    board: board,
+    seed: state.seed
+  }
+}

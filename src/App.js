@@ -3,7 +3,8 @@ import { connect, Provider } from 'react-redux';
 import { store,
   init,
   moveDown, moveLeft, moveRight,
-  rotateRight } from './redux/actions.js';
+  rotateRight, mapStateProps
+} from './redux/actions.js';
 
 import logo from './logo.svg';
 import './App.css';
@@ -49,28 +50,6 @@ class Game extends Component {
         <Board rows={this.props.board} />
       </div>
     )
-  }
-}
-
-const mapStateProps = state => {
-  let board = state.board.map(a => a.map(b => b))
-
-  const shape = state.shape.shape;
-  const top = state.shape.top;
-  const left = state.shape.left;
-  const right = state.shape.right;
-  const bottom = state.shape.bottom;
-  const p = state.position;
-
-  for (let r = top; r < shape.length - bottom; r++) {
-    for (let c = left; c < shape[0].length - right; c++) {
-      board[p.row + r][p.col + c] = shape[r][c];
-    }
-  }
-
-  return {
-    board: board,
-    seed: state.seed
   }
 }
 
