@@ -471,17 +471,22 @@ function clearCompleteRows(board) {
 }
 
 function game(state = initialState, action) {
-  if (state.isColision) {
-    const colided = addShapeToBoard(state.board, getShape(state), state.position);
-    const [cleared, rowsCleared] = clearCompleteRows(colided);
-    return reduceNextShape({
-      ...state,
-      board: cleared,
-      score: state.score + rowsCleared,
-      isColision: false
-    });
-  }
+  const newState = reduceAction(state, action);
+  return newState.isColision ? reduceCollision(newState) : newState;
+}
 
+function reduceCollision(state) {
+  const colided = addShapeToBoard(state.board, getShape(state), state.position);
+  const [cleared, rowsCleared] = clearCompleteRows(colided);
+  return reduceNextShape({
+    ...state,
+    board: cleared,
+    score: state.score + rowsCleared,
+    isColision: false
+  });
+}
+
+function reduceAction(state, action) {
   switch (action.type) {
     case ActionType.INIT:
       return reduceInit(state, action.seed);
