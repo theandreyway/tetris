@@ -251,11 +251,26 @@ const ActionType = {
   MOVE_LEFT: "MOVE_LEFT",
   MOVE_RIGHT: "MOVE_RIGHT",
   ROTATE_RIGHT: "ROTATE_RIGHT",
-  DROP: "DROP"
+  DROP: "DROP",
+  START_MOVE: "MOVE",
+  STOP_MOVE: "STOP_MOVE",
+  TICK: "TICK"
 }
 
 export function init(seed) {
   return { type: ActionType.INIT, seed: seed };
+}
+
+export function startMove(direction) {
+  return { type: ActionType.START_MOVE, direction: direction };
+}
+
+export function tick() {
+  return { type: ActionType.TICK };
+}
+
+export function stopMove() {
+  return { type: ActionType.STOP_MOVE };
 }
 
 export function moveDown() {
@@ -298,7 +313,12 @@ const initialState = {
   rotationIndex: 0,
   isCollision: false,
   isGameOver: false,
-  score: 0
+  score: 0,
+  direction: "",
+  downTick: 0,
+  actionTick: 0,
+  downFrameRate: 60,
+  actionFrameRate: 10
 }
 
 // Using the first set of numbers from the table in
@@ -359,11 +379,13 @@ function reduceMoveDown(state) {
   const position = {row: row, col: col};
   const isCollision = checkForCollision(state.board, shape, position);
 
-  return {...state,
+  const newState = {...state,
     position: isCollision ? state.position : position,
     // it's a colision if the block didn't move down.
     isCollision: isCollision || state.position.row === row
-  }
+  };
+
+  return newState;
 }
 
 function reduceDrop(state) {
@@ -488,6 +510,60 @@ function clearCompleteRows(board) {
   }
 }
 
+function reduceStopMove(state) {
+  return {...state, direction:"", actionTick: 0, downTick: 0 };
+}
+
+function reduceMove(state) {
+  switch (state.direction) {
+    case "left":
+      return reduceMoveLeft(state);
+    case "right":
+      return reduceMoveRight(state);
+    case "down":
+      return reduceMoveDown(state);
+    default:
+      return state;
+      break;
+    }
+}
+
+function reduceStartMove(state, direction) {
+  return reduceMove({...state, direction:direction });
+}
+
+function reduceActionTick(state) {
+
+  switch (state.direction) {
+    case "left":
+    case "right":
+      if(state.actionTick > state.actionFrameRate) {
+        return reduceMove({...state, actionTick: 0 });
+      } else {
+        return {...state, actionTick: state.actionTick + 1 };
+      }
+      break;
+    case "down":
+      return {... state, downTick: state.downTick + 1};
+    default:
+      return state;
+      break;
+  }
+}
+
+function reduceDownTick(state) {
+  if (state.downTick > state.downFrameRate) {
+    return reduceMoveDown({...state, downTick:0 });
+  } else {
+    return { ...state, downTick: state.downTick + 1 };
+  }
+}
+
+function reduceTick(state) {
+  const actionState = reduceActionTick(state);
+  return reduceDownTick(actionState);
+}
+
 function game(state = initialState, action) {
   if (state.isGameOver) {
     return state;
@@ -496,6 +572,28 @@ function game(state = initialState, action) {
   const newState = reduceAction(state, action);
   return newState.isCollision ? reduceCollision(newState) : newState;
 }
+
+function reduceAction(state, action) {
+  switch (action.type) {
+    case ActionType.INIT:
+      return reduceInit(state, action.seed);
+    case ActionType.TICK:
+      return reduceTick(state);
+    case ActionType.START_MOVE:
+      return reduceStartMove(state, action.direction);
+    case ActionType.MOVE_DOWN:
+      return reduceMoveDown(state);
+    case ActionType.STOP_MOVE:
+      return reduceStopMove(state);
+    case ActionType.ROTATE_RIGHT:
+      return reduceRotateRight(state);
+    case ActionType.DROP:
+      return reduceDrop(state);
+    default:
+      return state;
+  }
+}
+
 
 function reduceCollision(state) {
   const colided = addShapeToBoard(state.board, getShape(state), state.position);
@@ -506,25 +604,6 @@ function reduceCollision(state) {
     score: state.score + rowsCleared,
     isCollision: false
   });
-}
-
-function reduceAction(state, action) {
-  switch (action.type) {
-    case ActionType.INIT:
-      return reduceInit(state, action.seed);
-    case ActionType.MOVE_DOWN:
-      return reduceMoveDown(state);
-    case ActionType.MOVE_LEFT:
-      return reduceMoveLeft(state);
-    case ActionType.MOVE_RIGHT:
-      return reduceMoveRight(state);
-    case ActionType.ROTATE_RIGHT:
-      return reduceRotateRight(state);
-    case ActionType.DROP:
-      return reduceDrop(state);
-    default:
-      return state;
-  }
 }
 
 export const store = createStore(game);

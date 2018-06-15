@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { connect, Provider } from 'react-redux';
 import { store,
-  init,
+  init, tick,
+  startMove, stopMove,
   moveDown, drop,
-  moveLeft, moveRight,
   rotateRight, mapStateProps
 } from './redux/actions.js';
 
@@ -39,15 +39,32 @@ function BoardCell(props) {
   return <div className={className}/>
 }
 
+class Speed extends Component {
+  render() {
+
+    return (
+      <div>
+        {this.props.speed}
+      </div>
+    )
+  }
+}
+
 class Game extends Component {
   componentDidMount() {
     store.dispatch(init(Date.now()));
-    setInterval(() => store.dispatch(moveDown()), 500);
+    this.timer = setInterval(() => store.dispatch(tick()), 10);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timer);
   }
 
   render() {
     return (
-      <div tabIndex={0} onKeyDown={this.props.onKeyDown}>
+      <div tabIndex={0}
+            onKeyDown={this.props.onKeyDown}
+            onKeyUp={this.props.onKeyUp}>
         <p>seed is {this.props.seed}</p>
         <Board rows={this.props.board} />
       </div>
@@ -60,13 +77,13 @@ const mapDisptchToProps = dispatch => {
     onKeyDown: e => {
       switch (e.key) {
         case "ArrowDown":
-          dispatch(moveDown());
+          dispatch(startMove("down"));
           break;
         case "ArrowLeft":
-          dispatch(moveLeft());
+          dispatch(startMove("left"));
           break;
         case "ArrowRight":
-          dispatch(moveRight());
+          dispatch(startMove("right"));
           break;
         case "ArrowUp":
           dispatch(rotateRight());
@@ -77,6 +94,21 @@ const mapDisptchToProps = dispatch => {
         default:
           break;
       }
+      e.stopPropagation();
+      e.preventDefault();
+    },
+    onKeyUp: e => {
+      switch (e.key) {
+        case "ArrowDown":
+        case "ArrowLeft":
+        case "ArrowRight":
+          dispatch(stopMove());
+          break;
+        default:
+          break;
+      }
+      e.stopPropagation();
+      e.preventDefault();
     }
   }
 }
