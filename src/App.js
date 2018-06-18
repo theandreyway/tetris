@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
 import { connect, Provider } from 'react-redux';
 import { store,
-  init, tick,
-  startMove, stopMove,
-  moveDown, drop,
+  init, moveLeft, moveRight, moveDown, drop,
   rotateRight, mapStateProps
-} from './redux/actions.js';
+} from './redux/game.js';
 
 import logo from './logo.svg';
 import './App.css';
@@ -39,21 +37,10 @@ function BoardCell(props) {
   return <div className={className}/>
 }
 
-class Speed extends Component {
-  render() {
-
-    return (
-      <div>
-        {this.props.speed}
-      </div>
-    )
-  }
-}
-
 class Game extends Component {
   componentDidMount() {
     store.dispatch(init(Date.now()));
-    this.timer = setInterval(() => store.dispatch(tick()), 10);
+    this.timer = setInterval(() => store.dispatch(moveDown()), 500);
   }
 
   componentWillUnmount() {
@@ -77,32 +64,19 @@ const mapDisptchToProps = dispatch => {
     onKeyDown: e => {
       switch (e.key) {
         case "ArrowDown":
-          dispatch(startMove("down"));
+          dispatch(moveDown());
           break;
         case "ArrowLeft":
-          dispatch(startMove("left"));
+          dispatch(moveLeft());
           break;
         case "ArrowRight":
-          dispatch(startMove("right"));
+          dispatch(moveRight());
           break;
         case "ArrowUp":
           dispatch(rotateRight());
           break;
         case " ":
           dispatch(drop());
-          break;
-        default:
-          break;
-      }
-      e.stopPropagation();
-      e.preventDefault();
-    },
-    onKeyUp: e => {
-      switch (e.key) {
-        case "ArrowDown":
-        case "ArrowLeft":
-        case "ArrowRight":
-          dispatch(stopMove());
           break;
         default:
           break;

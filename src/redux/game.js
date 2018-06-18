@@ -1,52 +1,35 @@
 import { createStore } from "redux"
-import { SHAPE_ROTATIONS } from "shaes"
+import { SHAPE_ROTATIONS } from "./shapes.js"
 
-const ActionType = {
-  INIT: "INIT",
-  MOVE_DOWN: "MOVE_DOWN",
-  MOVE_LEFT: "MOVE_LEFT",
-  MOVE_RIGHT: "MOVE_RIGHT",
-  ROTATE_RIGHT: "ROTATE_RIGHT",
-  DROP: "DROP",
-  START_MOVE: "MOVE",
-  STOP_MOVE: "STOP_MOVE",
-  TICK: "TICK"
-}
+const INIT = "INIT";
+const MOVE_DOWN = "MOVE_DOWN";
+const MOVE_LEFT = "MOVE_LEFT";
+const MOVE_RIGHT = "MOVE_RIGHT";
+const ROTATE_RIGHT = "ROTATE_RIGHT";
+const DROP = "DROP";
 
 export function init(seed) {
-  return { type: ActionType.INIT, seed: seed };
-}
-
-export function startMove(direction) {
-  return { type: ActionType.START_MOVE, direction: direction };
-}
-
-export function tick() {
-  return { type: ActionType.TICK };
-}
-
-export function stopMove() {
-  return { type: ActionType.STOP_MOVE };
+  return { type: INIT, seed: seed };
 }
 
 export function moveDown() {
-  return { type: ActionType.MOVE_DOWN };
+  return { type: MOVE_DOWN };
 }
 
 export function moveLeft() {
-  return { type: ActionType.MOVE_LEFT };
+  return { type: MOVE_LEFT };
 }
 
 export function moveRight() {
-  return { type: ActionType.MOVE_RIGHT };
+  return { type: MOVE_RIGHT };
 }
 
 export function rotateRight() {
-  return { type: ActionType.ROTATE_RIGHT };
+  return { type: ROTATE_RIGHT };
 }
 
 export function drop() {
-  return { type: ActionType.DROP };
+  return { type: DROP };
 }
 
 function makeBlankBoard(numRows, numCols) {
@@ -65,34 +48,14 @@ const INITIAL_STATE = {
 
   board: makeBlankBoard(20, 10),
 
-    shapeIndex: 0,
-    rotationIndex: 0,
-    seed: -1,
-    position: {row: 0, col: 5},
-
-  shape: {
-    shapeIndex: 0,
-    rotationIndex: 0,
-    seed: -1,
-    position: {row: 0, col: 5},
-  },
+  shapeIndex: 0,
+  rotationIndex: 0,
+  seed: -1,
+  position: {row: 0, col: 5},
 
   isCollision: false,
   isGameOver: false,
-  score: 0,
-
-  repeater: {
-    autoDown: {
-
-    },
-    action: {
-      isRepeating: false,
-      action: undefined,
-    },
-
-    lastDownTime: undefined,
-
-  }
+  score: 0
 
 }
 
@@ -285,57 +248,6 @@ function clearCompleteRows(board) {
   }
 }
 
-function reduceStopMove(state) {
-  return {...state, direction:"", actionTick: 0 };
-}
-
-function reduceMove(state) {
-  switch (state.direction) {
-    case "left":
-      return reduceMoveLeft(state);
-    case "right":
-      return reduceMoveRight(state);
-    case "down":
-      return reduceMoveDown(state);
-    default:
-      return state;
-      break;
-    }
-}
-
-function reduceStartMove(state, direction) {
-  if (state.direction == "") {
-    return reduceMove({...state, direction:direction });
-  } else {
-    return state;
-  }
-}
-
-function reduceActionTick(state) {
-  if(state.actionTick > state.actionFrameRate) {
-    return reduceMove({...state, actionTick: 0 });
-  } else {
-    return {...state, actionTick: state.actionTick + 1 };
-  }
-}
-
-function reduceDownTick(state) {
-  if (state.downTick > state.downFrameRate) {
-    return reduceMoveDown({...state, downTick:0 });
-  } else {
-    return { ...state, downTick: state.downTick + 1 };
-  }
-}
-
-function reduceTick(state) {
-  console.log("tick");
-  const actionState = reduceActionTick(state);
-  if (actionState.direction !== "down") {
-    return reduceDownTick(actionState);
-  }
-  return actionState;
-}
-
 function game(state = INITIAL_STATE, action) {
   if (state.isGameOver) {
     return state;
@@ -347,19 +259,17 @@ function game(state = INITIAL_STATE, action) {
 
 function reduceAction(state, action) {
   switch (action.type) {
-    case ActionType.INIT:
+    case INIT:
       return reduceInit(state, action.seed);
-    case ActionType.TICK:
-      return reduceTick(state);
-    case ActionType.START_MOVE:
-      return reduceStartMove(state, action.direction);
-    case ActionType.MOVE_DOWN:
+    case MOVE_DOWN:
       return reduceMoveDown(state);
-    case ActionType.STOP_MOVE:
-      return reduceStopMove(state);
-    case ActionType.ROTATE_RIGHT:
+    case MOVE_LEFT:
+      return reduceMoveLeft(state);
+    case MOVE_RIGHT:
+      return reduceMoveRight(state);
+    case ROTATE_RIGHT:
       return reduceRotateRight(state);
-    case ActionType.DROP:
+    case DROP:
       return reduceDrop(state);
     default:
       return state;
