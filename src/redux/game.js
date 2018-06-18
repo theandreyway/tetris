@@ -1,5 +1,8 @@
 import { createStore } from "redux"
-import { SHAPE_ROTATIONS } from "./shapes.js"
+import { SHAPE_ROTATIONS } from "./game_shapes.js"
+import { INITIAL_BOARD_STATE,
+          addShapeToBoard, checkForCollision, clearCompleteRows
+       } from "./board.js"
 
 const INIT = "INIT";
 const MOVE_DOWN = "MOVE_DOWN";
@@ -32,21 +35,10 @@ export function drop() {
   return { type: DROP };
 }
 
-function makeBlankBoard(numRows, numCols) {
-  let rows = Array(numRows)
-  for (let r = 0; r < numRows; r++) {
-    rows[r] = Array(numCols);
-    for (let c = 0; c < numCols; c++) {
-      rows[r][c] = 0;
-    }
-  }
-
-  return rows;
-}
 
 const INITIAL_STATE = {
 
-  board: makeBlankBoard(20, 10),
+  board: INITIAL_BOARD_STATE,
 
   shapeIndex: 0,
   rotationIndex: 0,
@@ -96,10 +88,7 @@ function reduceNextShape(state) {
 }
 
 function reduceInit(state, seed) {
-  return reduceNextShape({...state,
-    board: makeBlankBoard(20, 10),
-    seed: seed
-  });
+  return reduceNextShape({...state, seed: seed });
 }
 
 function reduceMoveDown(state) {
@@ -205,46 +194,6 @@ function reduceRotateRight(state) {
     ...state,
     rotationIndex: rotationIndex,
     position: position
-  }
-}
-
-function addShapeToBoardAndCheckForCollision(originalBoard, shape, position) {
-  let board = originalBoard.map(a => a.map(b => b))
-  let isCollision = false;
-
-  for (let r = shape.top; r < shape.shape.length - shape.bottom; r++) {
-    for (let c = shape.left; c < shape.shape[0].length - shape.right; c++) {
-      if (shape.shape[r][c]) {
-        if(board[position.row + r][position.col + c]) {
-          isCollision = true;
-        } else {
-          board[position.row + r][position.col + c] = 1;
-        }
-      }
-    }
-  }
-
-  return [board, isCollision];
-}
-
-function addShapeToBoard(originalBoard, shape, position) {
-  return addShapeToBoardAndCheckForCollision(originalBoard, shape, position)[0];
-}
-
-function checkForCollision(originalBoard, shape, position) {
-  return addShapeToBoardAndCheckForCollision(originalBoard, shape, position)[1];
-}
-
-function clearCompleteRows(board) {
-  const cleared = board.filter(row => !row.reduce(
-    (acc, val) => {return acc && val === 1}, true));
-  const rowsCleared = board.length - cleared.length;
-
-  if (rowsCleared === 0) {
-    return [board, 0];
-  } else {
-    const newRows = makeBlankBoard(rowsCleared, board[0].length);
-    return [[...newRows, ...cleared], rowsCleared];
   }
 }
 
