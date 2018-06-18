@@ -1,8 +1,12 @@
 import { createStore } from "redux"
-import { SHAPE_ROTATIONS } from "./game_shapes.js"
+
+import { INITIAL_SHAPE_STATE,
+  getShape, reduceInitShape, reduceNextShape, reduceRotateShapeRight
+} from "./shape.js"
+
 import { INITIAL_BOARD_STATE,
-          addShapeToBoard, checkForCollision, clearCompleteRows
-       } from "./board.js"
+  addShapeToBoard, checkForCollision, clearCompleteRows
+} from "./board.js"
 
 const INIT = "INIT";
 const MOVE_DOWN = "MOVE_DOWN";
@@ -39,63 +43,51 @@ export function drop() {
 const INITIAL_STATE = {
 
   board: INITIAL_BOARD_STATE,
+  shape: INITIAL_SHAPE_STATE,
 
-  shapeIndex: 0,
-  rotationIndex: 0,
-  seed: -1,
   position: {row: 0, col: 5},
 
   isCollision: false,
   isGameOver: false,
   score: 0
-
 }
 
-// Using the first set of numbers from the table in
-// https://en.wikipedia.org/wiki/Linear_congruential_generator
-function nextSeed(seed) {
-  const a = 1664525;
-  const c = 1013904223;
-  const m = 2 ** 32;
 
-  return (a * seed + c) % m;
+function centerShape(board, shape) {
+  const boardLength = board[0].length;
+  const shapeLength = shape.shape[0].length;
+
+  return Math.trunc(
+    (boardLength - shapeLength - shape.left + shape.right + 1) / 2);
 }
 
-function getShape(state) {
-  return SHAPE_ROTATIONS[state.shapeIndex][state.rotationIndex];
-}
+function reduceInitNextShape(state) {
+  const shapeState = reduceNextShape(state.shape);
+  const shape = getShape(shapeState);
 
-function reduceNextShape(state) {
-  const shapeIndex = state.seed % SHAPE_ROTATIONS.length;
-  const rotationIndex = (state.seed % 13) % SHAPE_ROTATIONS[shapeIndex].length;
-  const shape = SHAPE_ROTATIONS[shapeIndex][rotationIndex];
-
+  const col = centerShape(state.board, shape);
   const row = 0 - shape.top;
-  const col = Math.trunc(
-    (state.board[0].length - shape.shape[0].length
-      - shape.left + shape.right + 1) / 2);
 
   const position = { row: row, col: col };
 
   return {
     ...state,
-    shapeIndex: shapeIndex,
-    rotationIndex: rotationIndex,
-    seed: nextSeed(state.seed),
+    shape: shapeState,
     position: position,
     isGameOver: checkForCollision(state.board, shape, position)
   }
 }
 
 function reduceInit(state, seed) {
-  return reduceNextShape({...state, seed: seed });
+  const seeded = {...state, shape: reduceInitShape(state.shape, seed) };
+  return reduceInitNextShape(seeded);
 }
 
 function reduceMoveDown(state) {
   const prevRow = state.position.row;
   const boardLength = state.board.length;
 
-  const shape = getShape(state);
+  const shape = getShape(state.shape);
   const shapeLength = shape.shape.length;
   const bottom = shape.bottom;
 
@@ -126,7 +118,7 @@ function reduceDrop(state) {
 function reduceMoveLeft(state) {
   const row = state.position.row;
 
-  const shape = getShape(state);
+  const shape = getShape(state.shape);
   const left = shape.left;
   const prevCol = state.position.col;
   const col = prevCol + left === 0 ? prevCol : prevCol - 1;
@@ -140,7 +132,7 @@ function reduceMoveLeft(state) {
 function reduceMoveRight(state) {
   const row = state.position.row;
 
-  const shape = getShape(state);
+  const shape = getShape(state.shape);
   const right = shape.right;
   const width = shape.shape[0].length;
   const prevCol = state.position.col;
@@ -155,10 +147,8 @@ function reduceMoveRight(state) {
 }
 
 function reduceRotateRight(state) {
-  const shapeIndex = state.shapeIndex;
-  const numRotations = SHAPE_ROTATIONS[shapeIndex].length;
-  const rotationIndex = (state.rotationIndex + 1) % numRotations;
-  const shape = SHAPE_ROTATIONS[shapeIndex][rotationIndex];
+  const shapeState = reduceRotateShapeRight(state.shape);
+  const shape = getShape(shapeState);
 
   // ignore rotation if it would make the shape go below the board
   if (state.position.row + shape.shape.length - shape.bottom > state.board.length) {
@@ -192,9 +182,20 @@ function reduceRotateRight(state) {
 
   return isCollision ? state : {
     ...state,
-    rotationIndex: rotationIndex,
+    shape: shapeState,
     position: position
   }
+}
+
+function reduceCollision(state) {
+  const colided = addShapeToBoard(state.board, getShape(state.shape), state.position);
+  const [cleared, rowsCleared] = clearCompleteRows(colided);
+  return reduceInitNextShape({
+    ...state,
+    board: cleared,
+    score: state.score + rowsCleared,
+    isCollision: false
+  });
 }
 
 function game(state = INITIAL_STATE, action) {
@@ -226,22 +227,12 @@ function reduceAction(state, action) {
 }
 
 
-function reduceCollision(state) {
-  const colided = addShapeToBoard(state.board, getShape(state), state.position);
-  const [cleared, rowsCleared] = clearCompleteRows(colided);
-  return reduceNextShape({
-    ...state,
-    board: cleared,
-    score: state.score + rowsCleared,
-    isCollision: false
-  });
-}
-
 export const store = createStore(game);
 
 export const mapStateProps = state => {
+  const shape = getShape(state.shape);
   return {
-    board: addShapeToBoard(state.board, getShape(state), state.position),
+    board: addShapeToBoard(state.board, shape, state.position),
     seed: state.seed
   }
 }
