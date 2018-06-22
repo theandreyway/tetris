@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
 import { connect, Provider } from 'react-redux';
 import { store,
-  init, moveLeft, moveRight, moveDown, drop,
+  initGame, moveLeft, moveRight, moveDown, drop,
   rotateRight, mapStateProps
 } from './redux/game.js';
-
+import {
+  INITIAL_TIMERS_STATE,
+  reduceInitTimers, doClearTimers
+} from "./redux/timers.js"
 import logo from './logo.svg';
 import './App.css';
 
@@ -38,13 +41,19 @@ function BoardCell(props) {
 }
 
 class Game extends Component {
+  constructor(props) {
+    super(props);
+    this.state = INITIAL_TIMERS_STATE;
+  }
+
   componentDidMount() {
-    store.dispatch(init(Date.now()));
-    this.timer = setInterval(() => store.dispatch(moveDown()), 500);
+    store.dispatch(initGame(Date.now()));
+    const autoDownInterval = 600 / (store.getState().score + 1 % 10);
+    this.setState(reduceInitTimers(this.state, autoDownInterval));
   }
 
   componentWillUnmount() {
-    clearInterval(this.timer);
+    doClearTimers(this.state);
   }
 
   render() {

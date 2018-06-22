@@ -8,16 +8,18 @@ import { INITIAL_BOARD_STATE,
   addShapeToBoard, checkForCollision, clearCompleteRows
 } from "./board.js"
 
-const INIT = "INIT";
+const INIT_GAME = "INIT_GAME"
 const MOVE_DOWN = "MOVE_DOWN";
 const MOVE_LEFT = "MOVE_LEFT";
 const MOVE_RIGHT = "MOVE_RIGHT";
 const ROTATE_RIGHT = "ROTATE_RIGHT";
 const DROP = "DROP";
 
-export function init(seed) {
-  return { type: INIT, seed: seed };
+
+export function initGame(seed) {
+  return { type: INIT_GAME, seed: seed };
 }
+
 
 export function moveDown() {
   return { type: MOVE_DOWN };
@@ -40,7 +42,7 @@ export function drop() {
 }
 
 
-const INITIAL_STATE = {
+const INITIAL_GAME_STATE = {
 
   board: INITIAL_BOARD_STATE,
   shape: INITIAL_SHAPE_STATE,
@@ -78,9 +80,9 @@ function reduceInitNextShape(state) {
   }
 }
 
-function reduceInit(state, seed) {
-  const seeded = {...state, shape: reduceInitShape(state.shape, seed) };
-  return reduceInitNextShape(seeded);
+function reduceInitGame(state, seed) {
+  const shape = reduceInitShape(state.shape, seed);
+  return reduceInitNextShape({...state, shape: shape });
 }
 
 function reduceMoveDown(state) {
@@ -187,30 +189,10 @@ function reduceRotateRight(state) {
   }
 }
 
-function reduceCollision(state) {
-  const colided = addShapeToBoard(state.board, getShape(state.shape), state.position);
-  const [cleared, rowsCleared] = clearCompleteRows(colided);
-  return reduceInitNextShape({
-    ...state,
-    board: cleared,
-    score: state.score + rowsCleared,
-    isCollision: false
-  });
-}
-
-function game(state = INITIAL_STATE, action) {
-  if (state.isGameOver) {
-    return state;
-  }
-
-  const newState = reduceAction(state, action);
-  return newState.isCollision ? reduceCollision(newState) : newState;
-}
-
 function reduceAction(state, action) {
   switch (action.type) {
-    case INIT:
-      return reduceInit(state, action.seed);
+    case INIT_GAME:
+      return reduceInitGame(state, action.seed);
     case MOVE_DOWN:
       return reduceMoveDown(state);
     case MOVE_LEFT:
@@ -226,8 +208,27 @@ function reduceAction(state, action) {
   }
 }
 
+function reduceCollision(state) {
+  const colided = addShapeToBoard(state.board, getShape(state.shape), state.position);
+  const [cleared, rowsCleared] = clearCompleteRows(colided);
+  return reduceInitNextShape({
+    ...state,
+    board: cleared,
+    score: state.score + rowsCleared,
+    isCollision: false
+  });
+}
 
-export const store = createStore(game);
+function reduceGame(state = INITIAL_GAME_STATE, action) {
+  if (state.isGameOver) {
+    return state;
+  }
+
+  const newState = reduceAction(state, action);
+  return newState.isCollision ? reduceCollision(newState) : newState;
+}
+
+export const store = createStore(reduceGame);
 
 export const mapStateProps = state => {
   const shape = getShape(state.shape);
