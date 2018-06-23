@@ -32,12 +32,6 @@
 .row {
   /* remove space between rows and cells */
   font-size: 0;
-  /*
-  outline: 0px;
-  border: 0px;
-  padding: 0px;
-  margin: 0px;
-  */
 }
 
 .cell {
@@ -51,6 +45,11 @@
 
 .on {
   background-color: black;
+}
+
+.game {
+  display: inline-block;
+  vertical-align: top;
 }
 
 @keyframes App-logo-spin {

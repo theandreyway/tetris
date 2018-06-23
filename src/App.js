@@ -60,8 +60,12 @@ class Game extends Component {
       <div tabIndex={0}
             onKeyDown={this.props.onKeyDown}
             onKeyUp={this.props.onKeyUp}>
-        <p>score is {this.props.score}</p>
-        <Board rows={this.props.board} />
+        <div className="game">
+          <Board rows={this.props.board} />
+        </div><div className="game">
+          <p> Score: {this.props.score} </p>
+          <p> Speed: {this.props.speed} </p>
+        </div>
       </div>
     )
   }
