@@ -6,7 +6,9 @@ import { store,
 } from './redux/game.js';
 import {
   timers,
-  reduceInitTimers, doClearTimers
+  reduceUpdateAutoDown, clearTimers,
+  reduceStartLeft, reduceStartRight,
+  reduceStopLeftRight, reduceStopDown
 } from "./redux/timers.js"
 import logo from './logo.svg';
 import './App.css';
@@ -44,11 +46,11 @@ class Game extends Component {
 
   componentDidMount() {
     store.dispatch(initGame(Date.now()));
-    timers.state = reduceInitTimers(timers.state, 600);
+    timers.state = reduceUpdateAutoDown(timers.state);
   }
 
   componentWillUnmount() {
-    doClearTimers(timers.state);
+    clearTimers(timers.state);
   }
 
   render() {
@@ -72,16 +74,31 @@ const mapDisptchToProps = dispatch => {
           dispatch(moveDown());
           break;
         case "ArrowLeft":
-          dispatch(moveLeft());
+          timers.state = reduceStartLeft(timers.state);
           break;
         case "ArrowRight":
-          dispatch(moveRight());
+          timers.state = reduceStartRight(timers.state);
           break;
         case "ArrowUp":
           dispatch(rotateRight());
           break;
         case " ":
           dispatch(drop());
+          break;
+        default:
+          break;
+      }
+      e.stopPropagation();
+      e.preventDefault();
+    },
+    onKeyUp: e => {
+      switch (e.key) {
+        case "ArrowDown":
+          this.state = reduceStopDown(timers.state);
+          break;
+        case "ArrowLeft":
+        case "ArrowRight":
+          timers.state = reduceStopLeftRight(timers.state);
           break;
         default:
           break;

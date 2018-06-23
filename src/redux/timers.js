@@ -1,4 +1,4 @@
-import { store, moveDown } from "./game.js"
+import { store, moveDown, moveLeft, moveRight } from "./game.js"
 
 class TimerStateBox {
   constructor(initialState) {
@@ -14,7 +14,8 @@ class TimerStateBox {
   }
 }
 
-const SPEED_TO_MILLIS = [600, 500, 400, 300, 200, 150, 100, 80, 60];
+const ACTION_MILLIS = 60;
+const SPEED_TO_MILLIS = [600, 500, 400, 300, 200, 150, 100, 80, 60, 40, 30];
 
 const INITIAL_TIMERS_STATE = {
   autoDownMillis: -1,
@@ -25,31 +26,83 @@ const INITIAL_TIMERS_STATE = {
   right: undefined
 }
 
-const START_DOWN = "START_DOWN";
-const START_LEFT = "START_LEFT";
-const START_RIGHT = "START_RIGHT";
+export function reduceStartLeft(state) {
+  if (state.left) {
+    return state;
+  }
 
-const STOP_DOWN = "STOP_DOWN";
-const STOP_LEFT = "STOP_LEFT";
-const STOP_RIGHT = "STOP_RIGHT";
+  if (state.right) {
+    clearInterval(state.right);
+  }
 
-const INIT_TIMERS = "INIT_TIMERS";
+  return {
+    ...state,
+    left: setInterval(() => store.dispatch(moveLeft()), ACTION_MILLIS),
+    right: undefined
+  }
+}
 
+export function reduceStartRight(state) {
+  if (state.right) {
+    return state;
+  }
+
+  if (state.left) {
+    clearInterval(state.left);
+  }
+
+  return {
+    ...state,
+    left: undefined,
+    right: setInterval(() => store.dispatch(moveRight()), ACTION_MILLIS)
+  }
+}
+
+export function reduceStartDown(state) {
+
+}
+
+export function reduceStopLeftRight(state) {
+    if (state.left) {
+      clearInterval(state.left);
+    }
+
+    if (state.right) {
+      clearInterval(state.right);
+    }
+
+    return {
+      ...state,
+      left: undefined,
+      right: undefined
+    };
+}
+
+export function reduceStopDown(state) {
+
+}
+
+export function reduceUpdateAutoDown(state) {
+  const autoDownMillis = convertScoreToInterval(store.getState().score);
+  return {
+    ...state,
+    autoDownMillis: autoDownMillis,
+    autoDown: setInterval(autoDownTick, autoDownMillis)
+  }
+}
+
+export const timers = new TimerStateBox(INITIAL_TIMERS_STATE);
 
 function convertScoreToInterval(score) {
   const index = Math.min(Math.floor(score), SPEED_TO_MILLIS.length - 1);
   return SPEED_TO_MILLIS[index];
 }
 
-
 function updateSpeedIfItChanged() {
   const autoDownMillis = convertScoreToInterval(store.getState().score);
   if (timers.state.autoDownMillis !== autoDownMillis) {
     clearInterval(timers.state.autoDown);
-    timers.state = {...timers.state,
-      autoDownMillis: autoDownMillis,
-      autoDown: setInterval(autoDownTick, autoDownMillis)
-    };
+    timers.state = reduceUpdateAutoDown(timers.state);
   }
 }
 
@@ -58,19 +111,9 @@ function autoDownTick() {
   store.dispatch(moveDown());
 }
 
-export function reduceInitTimers(state, autoDownMillis) {
-  return {
-    ...state,
-    autoDownMillis: autoDownMillis,
-    autoDown: setInterval(autoDownTick, autoDownMillis)
-  }
-}
-
-export function doClearTimers(state) {
+export function clearTimers(state) {
   clearInterval(state.autoDown);
   clearInterval(state.down);
   clearInterval(state.left);
   clearInterval(state.right);
 }
-
-export const timers = new TimerStateBox(INITIAL_TIMERS_STATE);
