@@ -68,10 +68,12 @@ export function reduceStartDown(state) {
     clearInterval(state.autoDown);
   }
 
+  const downMillis = Math.min(ACTION_MILLIS, state.autoDownMillis);
+
   return {
     ...state,
     autoDown: undefined,
-    down: setInterval(() => store.dispatch(moveDown()), ACTION_MILLIS)
+    down: setInterval(() => store.dispatch(moveDown()), downMillis)
   }
 }
 
