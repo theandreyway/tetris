@@ -17,46 +17,74 @@ class TimerStateBox {
 
 const ACTION_MILLIS = 60;
 const SPEED_TO_MILLIS = [600, 500, 400, 300, 200, 150, 100, 80, 60, 40, 30];
+const LEFT = "LEFT";
+const RIGHT = "RIGHT";
 
 const INITIAL_TIMERS_STATE = {
   autoDownMillis: -1,
+  leftRightPressCount: 0,
+  leftRight: undefined,
+  direction: undefined,
 
   autoDown: undefined,
   down: undefined,
-  left: undefined,
-  right: undefined
 }
 
 export function reduceStartLeft(state) {
-  if (state.left) {
+  if (state.direction === LEFT) {
     return state;
   }
 
-  if (state.right) {
-    clearInterval(state.right);
+  if (state.leftRight) {
+    clearInterval(state.leftRight);
   }
 
   return {
     ...state,
-    left: setInterval(() => store.dispatch(moveLeft()), ACTION_MILLIS),
-    right: undefined
+    direction: LEFT,
+    leftRight: setInterval(moveLeftTick, ACTION_MILLIS),
+    leftRightPressCount: state.leftRightPressCount + 1
   }
 }
 
 export function reduceStartRight(state) {
-  if (state.right) {
+  if (state.direction === RIGHT) {
     return state;
   }
 
-  if (state.left) {
-    clearInterval(state.left);
+  if (state.leftRight) {
+    clearInterval(state.leftRight);
   }
 
   return {
     ...state,
-    left: undefined,
-    right: setInterval(() => store.dispatch(moveRight()), ACTION_MILLIS)
+    direction: RIGHT,
+    leftRight: setInterval(moveRightTick, ACTION_MILLIS),
+    leftRightPressCount: state.leftRightPressCount + 1
   }
+}
+
+export function reduceStopLeft(state) {
+    clearInterval(state.leftRight);
+
+    return {
+      ...state,
+      leftRight: state.leftRightPressCount === 2 ? setInterval(moveRightTick, ACTION_MILLIS) : undefined,
+      direction: state.leftRightPressCount === 2 ? RIGHT : undefined,
+      leftRightPressCount: state.leftRightPressCount - 1
+    };
+}
+
+
+export function reduceStopRight(state) {
+    clearInterval(state.leftRight);
+
+    return {
+      ...state,
+      leftRight: state.leftRightPressCount === 2 ? setInterval(moveLeftTick, ACTION_MILLIS) : undefined,
+      direction: state.leftRightPressCount === 2 ? LEFT : undefined,
+      leftRightPressCount: state.leftRightPressCount - 1
+    };
 }
 
 export function reduceStartDown(state) {
@@ -73,24 +101,8 @@ export function reduceStartDown(state) {
   return {
     ...state,
     autoDown: undefined,
-    down: setInterval(() => store.dispatch(moveDown()), downMillis)
+    down: setInterval(moveDownTick, downMillis)
   }
-}
-
-export function reduceStopLeftRight(state) {
-    if (state.left) {
-      clearInterval(state.left);
-    }
-
-    if (state.right) {
-      clearInterval(state.right);
-    }
-
-    return {
-      ...state,
-      left: undefined,
-      right: undefined
-    };
 }
 
 export function reduceStopDown(state) {
@@ -128,6 +140,19 @@ function updateSpeedIfItChanged() {
 
 function autoDownTick() {
   updateSpeedIfItChanged();
+  store.dispatch(moveDown());
+}
+
+function moveLeftTick() {
+  store.dispatch(moveLeft());
+}
+
+
+function moveRightTick() {
+  store.dispatch(moveRight());
+}
+
+function moveDownTick() {
   store.dispatch(moveDown());
 }
 

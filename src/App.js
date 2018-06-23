@@ -7,8 +7,9 @@ import { store,
 import {
   timers,
   reduceAutoDown, clearTimers,
-  reduceStartLeft, reduceStartRight,
-  reduceStopLeftRight, reduceStartDown, reduceStopDown
+  reduceStartLeft, reduceStopLeft,
+  reduceStartRight, reduceStopRight,
+  reduceStartDown, reduceStopDown
 } from "./redux/timers.js"
 import logo from './logo.svg';
 import './App.css';
@@ -97,8 +98,10 @@ const mapDisptchToProps = dispatch => {
           timers.state = reduceStopDown(timers.state);
           break;
         case "ArrowLeft":
+          timers.state = reduceStopLeft(timers.state);
+          break;
         case "ArrowRight":
-          timers.state = reduceStopLeftRight(timers.state);
+          timers.state = reduceStopRight(timers.state);
           break;
         default:
           break;
