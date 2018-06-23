@@ -10,6 +10,7 @@ class TimerStateBox {
   }
 
   set state(newState) {
+    console.log(newState);
     this._state = newState;
   }
 }
@@ -59,7 +60,19 @@ export function reduceStartRight(state) {
 }
 
 export function reduceStartDown(state) {
+  if (state.down) {
+    return state;
+  }
 
+  if (state.autoDown) {
+    clearInterval(state.autoDown);
+  }
+
+  return {
+    ...state,
+    autoDown: undefined,
+    down: setInterval(() => store.dispatch(moveDown()), ACTION_MILLIS)
+  }
 }
 
 export function reduceStopLeftRight(state) {
@@ -79,10 +92,15 @@ export function reduceStopLeftRight(state) {
 }
 
 export function reduceStopDown(state) {
+  console.log("stop down");
+  if (state.down) {
+    clearInterval(state.down);
+  }
 
+  return reduceAutoDown({ ...state, down: undefined });
 }
 
-export function reduceUpdateAutoDown(state) {
+export function reduceAutoDown(state) {
   const autoDownMillis = convertScoreToInterval(store.getState().score);
   return {
     ...state,
@@ -102,7 +120,7 @@ function updateSpeedIfItChanged() {
   const autoDownMillis = convertScoreToInterval(store.getState().score);
   if (timers.state.autoDownMillis !== autoDownMillis) {
     clearInterval(timers.state.autoDown);
-    timers.state = reduceUpdateAutoDown(timers.state);
+    timers.state = reduceAutoDown(timers.state);
   }
 }
 

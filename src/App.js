@@ -6,9 +6,9 @@ import { store,
 } from './redux/game.js';
 import {
   timers,
-  reduceUpdateAutoDown, clearTimers,
+  reduceAutoDown, clearTimers,
   reduceStartLeft, reduceStartRight,
-  reduceStopLeftRight, reduceStopDown
+  reduceStopLeftRight, reduceStartDown, reduceStopDown
 } from "./redux/timers.js"
 import logo from './logo.svg';
 import './App.css';
@@ -46,7 +46,7 @@ class Game extends Component {
 
   componentDidMount() {
     store.dispatch(initGame(Date.now()));
-    timers.state = reduceUpdateAutoDown(timers.state);
+    timers.state = reduceAutoDown(timers.state);
   }
 
   componentWillUnmount() {
@@ -71,7 +71,7 @@ const mapDisptchToProps = dispatch => {
     onKeyDown: e => {
       switch (e.key) {
         case "ArrowDown":
-          dispatch(moveDown());
+          timers.state = reduceStartDown(timers.state);
           break;
         case "ArrowLeft":
           timers.state = reduceStartLeft(timers.state);
@@ -94,7 +94,7 @@ const mapDisptchToProps = dispatch => {
     onKeyUp: e => {
       switch (e.key) {
         case "ArrowDown":
-          this.state = reduceStopDown(timers.state);
+          timers.state = reduceStopDown(timers.state);
           break;
         case "ArrowLeft":
         case "ArrowRight":
