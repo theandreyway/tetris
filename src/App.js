@@ -5,7 +5,7 @@ import { store,
   rotateRight, mapStateProps
 } from './redux/game.js';
 import {
-  INITIAL_TIMERS_STATE,
+  timers,
   reduceInitTimers, doClearTimers
 } from "./redux/timers.js"
 import logo from './logo.svg';
@@ -41,27 +41,23 @@ function BoardCell(props) {
 }
 
 class Game extends Component {
-  constructor(props) {
-    super(props);
-    this.state = INITIAL_TIMERS_STATE;
-  }
 
   componentDidMount() {
     store.dispatch(initGame(Date.now()));
-    const autoDownInterval = 600 / (store.getState().score + 1 % 10);
-    this.setState(reduceInitTimers(this.state, autoDownInterval));
+    timers.state = reduceInitTimers(timers.state, 600);
   }
 
   componentWillUnmount() {
-    doClearTimers(this.state);
+    doClearTimers(timers.state);
   }
 
   render() {
+
     return (
       <div tabIndex={0}
             onKeyDown={this.props.onKeyDown}
             onKeyUp={this.props.onKeyUp}>
-        <p>seed is {this.props.seed}</p>
+        <p>score is {this.props.score}</p>
         <Board rows={this.props.board} />
       </div>
     )

@@ -234,6 +234,6 @@ export const mapStateProps = state => {
   const shape = getShape(state.shape);
   return {
     board: addShapeToBoard(state.board, shape, state.position),
-    seed: state.seed
+    score: state.score
   }
 }
