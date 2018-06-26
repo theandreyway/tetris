@@ -63,6 +63,7 @@ class Game extends Component {
         <div className="game">
           <Board rows={this.props.board} />
         </div><div className="game">
+          <Board rows={this.props.nextShape} />
           <p> Score: {this.props.score} </p>
           <p> Speed: {this.props.speed} </p>
         </div>

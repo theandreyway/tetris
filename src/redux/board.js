@@ -52,3 +52,4 @@ export function clearCompleteRows(board) {
 }
 
 export const INITIAL_BOARD_STATE = makeBlankBoard(20, 10);
+export const SHAPE_PREVIEW_BACKGROUND = makeBlankBoard(4, 4);

@@ -1,8 +1,14 @@
 import { SHAPE_ROTATIONS } from "./shapes.js"
 
 export const INITIAL_SHAPE_STATE = {
-  shapeIndex: 0,
-  rotationIndex: 0,
+  current: {
+    shapeIndex: 0,
+    rotationIndex: 0
+  },
+  next: {
+    shapeIndex: 0,
+    rotationIndex: 0
+  },
   seed: -1
 }
 
@@ -30,8 +36,11 @@ export function reduceNextShape(state) {
 
   return {
     ...state,
-    shapeIndex: shapeIndex,
-    rotationIndex: rotationIndex,
+    current: state.next,
+    next: {
+      shapeIndex: shapeIndex,
+      rotationIndex: rotationIndex
+    },
     seed: nextSeed(state.seed)
   }
 }
@@ -42,6 +51,12 @@ function nextRotationIndex(shapeIndex, rotationIndex) {
 }
 
 export function reduceRotateShapeRight(state) {
-  const rotationIndex = nextRotationIndex(state.shapeIndex, state.rotationIndex);
-  return { ...state, rotationIndex: rotationIndex }
+  const current = state.current;
+  const rotationIndex = nextRotationIndex(current.shapeIndex, current.rotationIndex);
+  return { ...state,
+    current: {
+      ...current,
+      rotationIndex: rotationIndex
+    }
+  };
 }

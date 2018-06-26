@@ -1,4 +1,12 @@
-import { store, moveDown, moveLeft, moveRight } from "./game.js"
+import {
+  store,
+  moveDown, moveLeft, moveRight,
+  convertScoreToSpeed
+} from "./game.js"
+
+import {
+  convertScoreToInterval
+} from "./speed.js"
 
 class TimerStateBox {
   constructor(initialState) {
@@ -10,13 +18,11 @@ class TimerStateBox {
   }
 
   set state(newState) {
-    console.log(newState);
     this._state = newState;
   }
 }
 
-const ACTION_MILLIS = 60;
-const SPEED_TO_MILLIS = [600, 500, 400, 300, 200, 150, 100, 80, 60, 40, 30];
+const ACTION_MILLIS = 50;
 const LEFT = "LEFT";
 const RIGHT = "RIGHT";
 
@@ -124,11 +130,6 @@ export function reduceAutoDown(state) {
 }
 
 export const timers = new TimerStateBox(INITIAL_TIMERS_STATE);
-
-function convertScoreToInterval(score) {
-  const index = Math.min(Math.floor(score), SPEED_TO_MILLIS.length - 1);
-  return SPEED_TO_MILLIS[index];
-}
 
 function updateSpeedIfItChanged() {
   const autoDownMillis = convertScoreToInterval(store.getState().score);
