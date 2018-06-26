@@ -32,7 +32,8 @@ const mapStateProps = state => {
   return {
     board: addShapeToBoard(state.board, shape, state.position),
     score: state.score,
-    nextShape: addShapeToBoard(SHAPE_PREVIEW_BACKGROUND, nextShape, nextShapePosition),
+    nextShape: addShapeToBoard(
+      SHAPE_PREVIEW_BACKGROUND, nextShape, nextShapePosition),
     speed: convertScoreToSpeed(state.score) + 1
   }
 }
@@ -42,13 +43,13 @@ const mapDisptchToProps = dispatch => {
     onKeyDown: e => {
       switch (e.key) {
         case "ArrowDown":
-          timers.state = reduceStartDown(timers.state);
+          timers.apply(reduceStartDown);
           break;
         case "ArrowLeft":
-          timers.state = reduceStartLeft(timers.state);
+          timers.apply(reduceStartLeft);
           break;
         case "ArrowRight":
-          timers.state = reduceStartRight(timers.state);
+          timers.apply(reduceStartRight);
           break;
         case "ArrowUp":
           dispatch(rotateRight());
@@ -65,13 +66,13 @@ const mapDisptchToProps = dispatch => {
     onKeyUp: e => {
       switch (e.key) {
         case "ArrowDown":
-          timers.state = reduceStopDown(timers.state);
+          timers.apply(reduceStopDown);
           break;
         case "ArrowLeft":
-          timers.state = reduceStopLeft(timers.state);
+          timers.apply(reduceStopLeft);
           break;
         case "ArrowRight":
-          timers.state = reduceStopRight(timers.state);
+          timers.apply(reduceStopRight);
           break;
         default:
           break;

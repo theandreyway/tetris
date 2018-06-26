@@ -19,6 +19,13 @@ class TimerStateBox {
   set state(newState) {
     this._state = newState;
   }
+
+  apply(func) {
+    const newState = func(this.state);
+    if (newState !== this.state) {
+      this.state = newState;
+    }
+  }
 }
 
 const ACTION_MILLIS = 50;
