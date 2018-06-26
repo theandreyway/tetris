@@ -4,9 +4,7 @@ import { INITIAL_SHAPE_STATE,
   getShape, reduceInitShape, reduceNextShape, reduceRotateShapeRight
 } from "./shape.js"
 
-import { convertScoreToSpeed } from "./speed.js"
-
-import { INITIAL_BOARD_STATE, SHAPE_PREVIEW_BACKGROUND,
+import { INITIAL_BOARD_STATE,
   addShapeToBoard, checkForCollision, clearCompleteRows
 } from "./board.js"
 
@@ -233,15 +231,3 @@ function reduceGame(state = INITIAL_GAME_STATE, action) {
 }
 
 export const store = createStore(reduceGame);
-
-export const mapStateProps = state => {
-  const shape = getShape(state.shape.current);
-  const nextShape = getShape(state.shape.next);
-  const nextShapePosition = {row: 0, col: 0};
-  return {
-    board: addShapeToBoard(state.board, shape, state.position),
-    score: state.score,
-    nextShape: addShapeToBoard(SHAPE_PREVIEW_BACKGROUND, nextShape, nextShapePosition),
-    speed: convertScoreToSpeed(state.score) + 1
-  }
-}

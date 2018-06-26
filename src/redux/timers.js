@@ -1,7 +1,6 @@
 import {
   store,
-  moveDown, moveLeft, moveRight,
-  convertScoreToSpeed
+  moveDown, moveLeft, moveRight
 } from "./game.js"
 
 import {
@@ -112,7 +111,6 @@ export function reduceStartDown(state) {
 }
 
 export function reduceStopDown(state) {
-  console.log("stop down");
   if (state.down) {
     clearInterval(state.down);
   }
